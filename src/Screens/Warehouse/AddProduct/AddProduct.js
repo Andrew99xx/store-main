@@ -129,130 +129,164 @@ const AddProduct = () => {
     }
   };
 
+
+  const itemWrapper = 'flex flex-col gap-2 w-full'
+  const itemName = 'text-xl ml-1'
+  const itemInputField = 'border border-gray-950 h-12 px-2 py-2 w-full rounded-md'
+
+
   return (
-    <div className="addproduct">
-      <h1>Add Product</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="products">
-          <p>Product Name:</p>
-          <input
-            type="text"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            required
-            className="inputfield"
-            placeholder="Product Name"
-          />
-          {existingProducts.length > 0 && (
-            <div>
-              <p>Existing products:</p>
-              <ul>
-                {existingProducts.map(product => (
-                  <li key={product.id}>
-                    {product.name} - {product.quantity} units @ ₹ {product.price} each, {product.weight} {product.unit}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-        <div>
-          <p>Quantity:</p>
-          <input
-            type="number"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-            required
-            className="inputfield"
-            placeholder="Enter Quantity"
-          />
-        </div>
-        <div>
-          <p>Price:</p>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(parseFloat(e.target.value))}
-            required
-            className="inputfield"
-            placeholder="Enter Price"
-          />
-        </div>
-        <div>
-          <p>Weight:</p>
-          <input
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(parseFloat(e.target.value))}
-            required
-            className="inputfield"
-            placeholder="Weigth"
-          />
-          <select className="inputunit" value={unit} onChange={(e) => setUnit(e.target.value)} required>
-            {units.map(unit => (
-              <option key={unit} value={unit}>{unit}</option>
-            ))}
-          </select>
-        </div>
-        <div className="paidstatus">
-          <label>Paid:</label>
-          <input
-            type="checkbox"
-            checked={paid}
-            onChange={(e) => setPaid(e.target.checked)}
-            className="paid"
-          />
-        </div>
-        {paid && (
-          <div>
-            <p>Payment Mode:</p>
-            <select
-              value={paymentMode}
-              onChange={(e) => setPaymentMode(e.target.value)}
-              className="inputfield"
-            >
-              {paymentModes.map(mode => (
-                <option key={mode} value={mode}>{mode}</option>
-              ))}
-            </select>
-          </div>
-        )}
-        {!paid && (
-          <div>
-            <label>Creditor:</label>
-            <select
-              value={selectedCreditor}
-              onChange={(e) => setSelectedCreditor(e.target.value)}
-              className="inputfield"
-            >
-              <option value="">Select a creditor</option>
-              {creditors.map(creditor => (
-                <option key={creditor.id} value={creditor.id}>{creditor.name}</option>
-              ))}
-             
-                <option value="newCreditor">Add New Creditor</option>
-                </select>
-                <div> 
-                  {selectedCreditor === "newCreditor" && (
-           <> <label>Enter name:</label>
-            
-                 
-                  <input
-                    type="text"
-                    value={creditorName}
-                    onChange={(e) => setCreditorName(e.target.value)}
-                    required
-                    className="inputfield"
-                    placeholder="Enter creditor name"
-                  /></>
-                )}</div>
+    <div className="bg-gray-100 w-full flex justify-center items-center">
+      <div className="p-6 w-full md:w-2/3 lg:w-1/2 text-gray-900 flex flex-col gap-6 items-center justify-start ">
+        <h1 className="text-3xl w-full text-gray-800 font-semibold">Add Product</h1>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full rounded-md shadow-md px-4 py-6 bg-white flex flex-col gap-8"
+        >
+          <div className={itemWrapper}>
+            <p className={itemName}>Product Name:</p>
+            <input
+              type="text"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              required
+              className={itemInputField}
+              placeholder="Enter Product Name"
+            />
+            {existingProducts.length > 0 && (
+              <div>
+                <p>Existing products:</p>
+                <ul>
+                  {existingProducts.map(product => (
+                    <li key={product.id}>
+                      {product.name} - {product.quantity} units @ ₹ {product.price} each, {product.weight} {product.unit}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
-            <button type="submit" className="btn">Save</button>
-          </form>
-        </div>
-      );
-    };
-    
-    export default AddProduct;
-    
+          </div>
+          <div className={itemWrapper}>
+            <p className={itemName}>Quantity:</p>
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
+              required
+              className={itemInputField}
+              placeholder="Enter Quantity"
+            />
+          </div>
+          <div className={itemWrapper}>
+            <p className={itemName}>Price:</p>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(parseFloat(e.target.value))}
+              required
+              className={itemInputField}
+              placeholder="Enter Price"
+            />
+          </div>
+          <div className={itemWrapper}>
+            <p className={itemName}>Weight:</p>
+
+            <div className="flex gap-2 w-full">
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(parseFloat(e.target.value))}
+                required
+                className={itemInputField}
+                placeholder="Enter Weight"
+              />
+              <select
+                className={itemInputField}
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                required
+              >
+                {units.map(unit => (
+                  <option key={unit} value={unit}>{unit}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex gap-2 justify-center items-center">
+            <label className={itemName}>Paid:</label>
+            <input
+              type="checkbox"
+              checked={paid}
+              onChange={(e) => setPaid(e.target.checked)}
+              className="mt-1 h-5 w-5"
+            />
+          </div>
+
+          {paid && (
+            <div className={itemWrapper}>
+              <p className={itemName}>Payment Mode:</p>
+              <select
+                value={paymentMode}
+                onChange={(e) => setPaymentMode(e.target.value)}
+                className={itemInputField}
+              >
+                {paymentModes.map(mode => (
+                  <option
+                    key={mode}
+                    value={mode}
+                  >{mode}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {!paid && (
+            <div className={itemWrapper}>
+              <label className={itemName}>Creditor:</label>
+              <select
+                value={selectedCreditor}
+                onChange={(e) => setSelectedCreditor(e.target.value)}
+                className={itemInputField}
+              >
+                <option value="" disabled>Select a creditor</option>
+                {creditors.map(creditor => (
+                  <option
+                    key={creditor.id}
+                    value={creditor.id}>
+                    {creditor.name}
+                  </option>
+                ))}
+                <option
+                  value="newCreditor">
+                  Add New Creditor
+                </option>
+              </select>
+              <div className="w-full mt-4">
+                {selectedCreditor === "newCreditor" && (
+                  <div className={itemWrapper}>
+                    <label className={itemName}>Creditor name:</label>
+                    <input
+                      type="text"
+                      value={creditorName}
+                      onChange={(e) => setCreditorName(e.target.value)}
+                      required
+                      className={itemInputField}
+                      placeholder="Enter creditor name"
+                    />
+                  </div>
+                )}</div>
+            </div>
+          )}
+          <button
+            type="submit"
+            className="w-full bg-blue-700 text-white p-3 text-xl font-bold">
+            Save
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddProduct;

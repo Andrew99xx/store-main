@@ -1,15 +1,15 @@
-.addproduct{
+.addproduct {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.inputfield{
+.inputfield {
     padding: .8rem .5rem;
     width: 300px;
 }
 
-.inputunit{
+.inputunit {
     width: 100px;
     padding: .8rem 1rem;
     font-size: 14px;
@@ -28,16 +28,16 @@
     border-radius: 0.15em;
     margin-left: 10px;
     transform: translateY(-0.075em);
-  }
-  
+}
 
-  .paidstatus{
-      display: flex;
-      align-items: center;
-      padding-top: 1rem;
-  }
 
-.btn{
+.paidstatus {
+    display: flex;
+    align-items: center;
+    padding-top: 1rem;
+}
+
+.btn {
     padding: .7rem 1.5rem;
     color: black;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db, collection, getDocs, query, where } from '../../firebase';
 import { Link } from 'react-router-dom';
-import './admin.css';
+import './Admin.css';
 
 const AdminDashboard = () => {
   const [totalSales, setTotalSales] = useState({ today: 0, week: 0, month: 0 });
