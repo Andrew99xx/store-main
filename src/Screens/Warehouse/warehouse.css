@@ -1,0 +1,43 @@
+.addproduct{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inputfield{
+    padding: .8rem .5rem;
+    width: 300px;
+}
+
+.inputunit{
+    width: 100px;
+    padding: .8rem 1rem;
+    font-size: 14px;
+    margin-left: 1rem;
+}
+
+.paid input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid currentColor;
+    border-radius: 0.15em;
+    margin-left: 10px;
+    transform: translateY(-0.075em);
+  }
+  
+
+  .paidstatus{
+      display: flex;
+      align-items: center;
+      padding-top: 1rem;
+  }
+
+.btn{
+    padding: .7rem 1.5rem;
+    color: black;
+}
