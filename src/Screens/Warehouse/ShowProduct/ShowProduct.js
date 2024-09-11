@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db, collection, getDocs, doc, updateDoc } from "../../../firebase";
+import CustomButton from "../../../components/cssComponents/CustomButton.jsx";
+import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSubmit.jsx";
 
 const units = ["kg", "gram", "liter", "milliliter"];
 
@@ -89,12 +91,12 @@ const ShowProducts = () => {
                   <p>Weight : {product.weight} {product.unit} each</p>
                 </div>
                 <div className="flex-1">
-                  <button
+
+                  <CustomButton
                     onClick={() => handleEdit(product)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-md"
                   >
                     Edit
-                  </button>
+                  </CustomButton>
                 </div>
               </div>
             ))}
@@ -153,8 +155,16 @@ const ShowProducts = () => {
                   </div>
                 </div>
                 <div className="flex justify-end gap-4">
-                  <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Update</button>
-                  <button type="button" onClick={() => setShowModal(false)} className="bg-red-500 text-white px-4 py-2 rounded-md">Cancel</button>
+                  <CustomButtonSubmit
+                  >
+                    Update
+                  </CustomButtonSubmit>
+                  <CustomButton
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </CustomButton>
+                 
                 </div>
               </form>
             </div>

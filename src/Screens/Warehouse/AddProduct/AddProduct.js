@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db, collection, addDoc, query, where, getDocs, updateDoc, doc, serverTimestamp } from "../../../firebase";
-import "../warehouse.css";
+// import "../warehouse.css";
+import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSubmit.jsx"
 
 const units = ["kg", "gram", "liter", "milliliter"];
 const paymentModes = ["online", "cash"];
@@ -19,6 +20,8 @@ const AddProduct = () => {
   const [selectedCreditor, setSelectedCreditor] = useState("");
 
   useEffect(() => {
+
+    // where we are using this
     const fetchProducts = async () => {
       if (productName) {
         const normalizedProductName = productName.toLowerCase().trim();
@@ -28,6 +31,7 @@ const AddProduct = () => {
       }
     };
 
+    // creditors name 
     const fetchCreditors = async () => {
       try {
         const creditorsRef = collection(db, "creditors");
@@ -262,7 +266,7 @@ const AddProduct = () => {
                   Add New Creditor
                 </option>
               </select>
-              <div className="w-full mt-4">
+              <div className="w-full">
                 {selectedCreditor === "newCreditor" && (
                   <div className={itemWrapper}>
                     <label className={itemName}>Creditor name:</label>
@@ -278,11 +282,9 @@ const AddProduct = () => {
                 )}</div>
             </div>
           )}
-          <button
-            type="submit"
-            className="w-full bg-blue-700 text-white p-3 text-xl font-bold">
+          <CustomButtonSubmit>
             Save
-          </button>
+          </CustomButtonSubmit>
         </form>
       </div>
     </div>
