@@ -256,219 +256,167 @@ const MakeBill = () => {
   };
 
   return (
-    <div className="makebill">
-      <h2>Make Bill</h2>
+    <div className="max-w-7xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Bill</h2>
 
       <div>
-        <h3>Select Products</h3>
+        <h3 className="text-lg font-semibold mb-2 text-gray-700">Select Products</h3>
         <input
           type="text"
           placeholder="Search Products"
           value={searchQuery}
-          className="inputfield"
+          className=" border rounded px-3 py-2 w-full mb-4 text-gray-700"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <h4>Top picks</h4>
-        <table>
+        <h4 className="text-md font-medium mb-2 text-gray-600">Top picks</h4>
+        <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Weight</th>
-              <th>Price</th>
-              <th>Quantity Available</th>
-              <th>Select Quantity</th>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Weight</th>
+              <th className="px-4 py-2 text-left">Price</th>
+              <th className="px-4 py-2 text-left">Quantity Available</th>
+              <th className="px-4 py-2 text-left">Select Quantity</th>
             </tr>
           </thead>
           <tbody>
             {filteredProducts.map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>{product.weight + product.unit}</td>
-                <td>₹{product.price}</td>
-                <td>{product.quantity}</td>
-                <td>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <button onClick={() => handleAddProduct(product, -1)}>
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      min="0"
-                      max={product.quantity}
-                      placeholder="Quantity"
-                      value={selectedProducts.find((p) => p.id === product.id)
+              <tr key={product.id} className="border-t">
+                <td className="px-4 py-2">{product.id}</td>
+                <td className="px-4 py-2">{product.name}</td>
+                <td className="px-4 py-2">{product.weight + product.unit}</td>
+                <td className="px-4 py-2">₹{product.price}</td>
+                <td className="px-4 py-2">{product.quantity}</td>
+                <td className="px-4 py-2 flex items-center">
+                  <button
+                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                    onClick={() => handleAddProduct(product, -1)}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    max={product.quantity}
+                    placeholder="Quantity"
+                    value={
+                      selectedProducts.find((p) => p.id === product.id)
                         ?.selectedQuantity || 0
                     }
                     onChange={(e) => handleInputChange(product, e)}
-                    style={{ width: "50px", textAlign: "center" }}
+                    className="border w-16 mx-2 px-2 py-1 text-center rounded"
                   />
-                  <button onClick={() => handleAddProduct(product, 1)}>
+                  <button
+                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                    onClick={() => handleAddProduct(product, 1)}
+                  >
                     +
                   </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3>Selected Products</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Weight</th>
-            <th>Price</th>
-            <th>Selected Quantity</th>
-            <th>Total Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td>{product.weight + product.unit}</td>
-              <td>₹{product.price}</td>
-              <td>{product.selectedQuantity}</td>
-              <td>₹{product.selectedQuantity * product.price}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setSelectedProducts(
-                      selectedProducts.filter((p) => p.id !== product.id)
-                    )
-                  }
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-
-    <hr />
-
-    <div className="flex">
-      <Autosuggest
-        suggestions={customers}
-        onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={onSuggestionsClearRequested}
-        getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
-        inputProps={inputProps}
-        onSuggestionSelected={onSuggestionSelected}
-      />
-      <button onClick={handleFindOrAddCustomer}>Select customer</button>
-    </div>
-
-    <div>
-      <h3>Total Amount: ₹{totalAmount.toFixed(2)}</h3>
-      <div>
-        <label>
-          <input
-            type="radio"
-            name="paymentStatus"
-            value="paid"
-            checked={paymentStatus === "paid"}
-            onChange={() => handlePaymentStatusChange("paid")}
-          />
-          Paid
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="paymentStatus"
-            value="due"
-            checked={paymentStatus === "due"}
-            onChange={() => handlePaymentStatusChange("due")}
-          />
-          Due
-        </label>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-<br />
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={isGstApplied}
-            onChange={handleGstChange}
-          />
-          GST Billing
-        </label>
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Selected Products</h3>
+        <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Weight</th>
+              <th className="px-4 py-2 text-left">Price</th>
+              <th className="px-4 py-2 text-left">Selected Quantity</th>
+              <th className="px-4 py-2 text-left">Total Price</th>
+              <th className="px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedProducts.map((product) => (
+              <tr key={product.id} className="border-t">
+                <td className="px-4 py-2">{product.id}</td>
+                <td className="px-4 py-2">{product.name}</td>
+                <td className="px-4 py-2">{product.weight + product.unit}</td>
+                <td className="px-4 py-2">₹{product.price}</td>
+                <td className="px-4 py-2">{product.selectedQuantity}</td>
+                <td className="px-4 py-2">₹{product.selectedQuantity * product.price}</td>
+                <td className="px-4 py-2">
+                  <button
+                    className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    onClick={() =>
+                      setSelectedProducts(
+                        selectedProducts.filter((p) => p.id !== product.id)
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {isGstApplied && (
-        <div>
-          <h3>GST Amount: ₹{gstAmount.toFixed(2)}</h3>
-          <h3>Final Amount: ₹{finalAmount.toFixed(2)}</h3>
-        </div>
-      )}
+      <hr className="my-8 border-gray-300" />
 
-      {isGstApplied && (
-        <div>
-          <label>
-            GST Number:
-            <input
-              type="text"
-              value={gstNumber}
-              onChange={handleGstNumberChange}
-              className="inputfield"
-            />
-          </label>
-        </div>
-      )}
+      <div className="flex items-center mb-4">
+        <Autosuggest
+          suggestions={customers}
+          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          inputProps={inputProps}
+          onSuggestionSelected={onSuggestionSelected}
+        />
+        <button
+          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={handleFindOrAddCustomer}
+        >
+          Select customer
+        </button>
+      </div>
 
-      <h3>Amount Paid: ₹{amountPaid.toFixed(2)}</h3>
-
-      {paymentStatus === "paid" && (
-        <div>
-          <label>
+      <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
+        <div className="mb-4">
+          <label className="mr-4">
             <input
               type="radio"
-              name="paymentMethod"
-              value="cash"
-              checked={paymentMethod === "cash"}
-              onChange={() => handlePaymentMethodChange("cash")}
+              name="paymentStatus"
+              value="paid"
+              checked={paymentStatus === "paid"}
+              onChange={() => handlePaymentStatusChange("paid")}
+              className="mr-2"
             />
-            Cash
+            Paid
           </label>
           <label>
             <input
               type="radio"
-              name="paymentMethod"
-              value="upi_card"
-              checked={paymentMethod === "upi_card"}
-              onChange={() => handlePaymentMethodChange("upi_card")}
+              name="paymentStatus"
+              value="due"
+              checked={paymentStatus === "due"}
+              onChange={() => handlePaymentStatusChange("due")}
+              className="mr-2"
             />
-            UPI/Card
+            Due
           </label>
         </div>
-      )}
-      <br />
 
-      <button
-        onClick={handleCompleteBill}
-        disabled={
-          !customerId ||
-          (paymentStatus === "paid" && amountPaid < finalAmount)
-        }
-      >
-        Complete Bill
-      </button>
-      <br /><br /><br />
+        <button
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          onClick={handleCompleteBill}
+        >
+          Complete Bill
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default MakeBill;

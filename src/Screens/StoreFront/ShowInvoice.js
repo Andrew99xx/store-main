@@ -7,8 +7,8 @@ const ShowInvoice = ({ invoice: propInvoice }) => {
     const [invoice, setInvoice] = useState(propInvoice || null);
 
     useEffect(() => {
-        if (!propInvoice && invoiceId) {
-            const fetchInvoice = async () => {
+        const fetchInvoice = async () => {
+            if (!propInvoice && invoiceId) {
                 const invoiceRef = doc(db, 'invoices', invoiceId);
                 const invoiceSnap = await getDoc(invoiceRef);
                 if (invoiceSnap.exists()) {
@@ -16,14 +16,14 @@ const ShowInvoice = ({ invoice: propInvoice }) => {
                 } else {
                     console.error("No such invoice!");
                 }
-            };
+            }
+        };
 
-            fetchInvoice();
-        }
+        fetchInvoice();
     }, [invoiceId, propInvoice]);
 
     if (!invoice) {
-        return <div>Loading...</div>;
+        return <div className="text-center text-lg">Loading...</div>;
     }
 
     const formatDate = (createdAt) => {
@@ -37,54 +37,54 @@ const ShowInvoice = ({ invoice: propInvoice }) => {
     };
 
     return (
-        <div className='makebill'>
-            <h2>Invoice</h2>
-            {invoice.id && <p><strong>Invoice ID:</strong> {invoice.id}</p>}
-            <p><strong>Customer Number:</strong> {invoice.customerName}</p>
-            <p><strong>Customer Id:</strong> {invoice.customerId}</p>
+        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">Invoice</h2>
+            {invoice.id && <p><strong className="font-semibold">Invoice ID:</strong> {invoice.id}</p>}
+            <p><strong className="font-semibold">Customer Number:</strong> {invoice.customerName}</p>
+            <p><strong className="font-semibold">Customer Id:</strong> {invoice.customerId}</p>
             
-            <h3>Products</h3>
-            <table>
+            <h3 className="text-xl font-semibold mt-6 mb-2">Products</h3>
+            <table className="min-w-full bg-gray-100 border border-gray-300 rounded-md">
                 <thead>
-                    <tr>
-                        <th>Product id</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
+                    <tr className="bg-gray-200 border-b">
+                        <th className="px-4 py-2 text-left">Product ID</th>
+                        <th className="px-4 py-2 text-left">Product Name</th>
+                        <th className="px-4 py-2 text-left">Quantity</th>
+                        <th className="px-4 py-2 text-left">Price</th>
+                        <th className="px-4 py-2 text-left">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     {invoice.products.map(product => (
-                        <tr key={product.productId}>
-                            <td>{product.productId}</td>
-
-                            <td>{product.productName}</td>
-                            <td>{product.quantity}</td>
-                            <td>₹{product.price.toFixed(2)}</td>
-                            <td>₹{(product.price * product.quantity).toFixed(2)}</td>
+                        <tr key={product.productId} className="border-b">
+                            <td className="px-4 py-2">{product.productId}</td>
+                            <td className="px-4 py-2">{product.productName}</td>
+                            <td className="px-4 py-2">{product.quantity}</td>
+                            <td className="px-4 py-2">₹{product.price.toFixed(2)}</td>
+                            <td className="px-4 py-2">₹{(product.price * product.quantity).toFixed(2)}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-          
-
-            <h4>Payment Status: {invoice.paymentStatus}</h4>
-            <h4>Payment Due: ₹{invoice.dueAmount.toFixed(2)}</h4>
-            <h4>Payment Method: {invoice.paymentMethod}</h4>
-              {invoice.isGstApplied && (
-                <>
-                    <h3>GST Details</h3>
-                    <p><strong>GST Number:</strong> {invoice.gstNumber}</p>
-                    <p><strong>Total Amount:</strong> ₹{invoice.totalAmount.toFixed(2)}</p>
-
-                    <p><strong>GST Amount:</strong> ₹{invoice.gstAmount.toFixed(2)}</p>
-                </>
-            )}
-            <h3><strong>Final Amount (including GST):</strong> ₹{invoice.finalAmount.toFixed(2)}</h3>
-            <p><strong>Date:</strong> {formatDate(invoice.createdAt)}</p>
-            <div className="fl"><button>Print</button></div>
+            <div className="mt-6">
+                <h4 className="text-lg font-semibold">Payment Status: {invoice.paymentStatus}</h4>
+                <h4 className="text-lg font-semibold">Payment Due: ₹{invoice.dueAmount.toFixed(2)}</h4>
+                <h4 className="text-lg font-semibold">Payment Method: {invoice.paymentMethod}</h4>
+                {invoice.isGstApplied && (
+                    <>
+                        <h3 className="text-xl font-semibold mt-6 mb-2">GST Details</h3>
+                        <p><strong className="font-semibold">GST Number:</strong> {invoice.gstNumber}</p>
+                        <p><strong className="font-semibold">Total Amount:</strong> ₹{invoice.totalAmount.toFixed(2)}</p>
+                        <p><strong className="font-semibold">GST Amount:</strong> ₹{invoice.gstAmount.toFixed(2)}</p>
+                    </>
+                )}
+                <h3 className="text-xl font-semibold mt-6">Final Amount (including GST): ₹{invoice.finalAmount.toFixed(2)}</h3>
+                <p><strong className="font-semibold">Date:</strong> {formatDate(invoice.createdAt)}</p>
+            </div>
+            <div className="mt-6 text-center">
+                <button className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600">Print</button>
+            </div>
         </div>
     );
 };
