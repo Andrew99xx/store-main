@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, doc, updateDoc, deleteDoc, getDoc } from '../../firebase';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const EditInvoice = () => {
     const { invoiceId } = useParams();
@@ -119,6 +119,13 @@ const EditInvoice = () => {
                         </button>
                     </div>
                 </form>
+                
+                <Link 
+                    to="/admin/invoices" 
+                    className="mt-6 inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-center w-full"
+                >
+                    Back
+                </Link>
             </div>
         </div>
     ) : (
