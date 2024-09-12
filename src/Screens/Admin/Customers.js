@@ -38,42 +38,49 @@ const Customers = () => {
     };
 
     return (
-        <div>
-            <div className='header'>
-                <Link to="/admin">Dashboard</Link>
-                <Link to="/admin/stock">Stock</Link>
-                <Link to="/admin/customers">Customers</Link>
-                <Link to="/admin/invoices">Invoices</Link>
+        <div className="p-4 bg-gray-50 min-h-screen">
+            <div className="flex space-x-4 bg-white p-4 shadow-md rounded-md">
+                <Link to="/admin" className="text-blue-600 hover:text-blue-800">Dashboard</Link>
+                <Link to="/admin/stock" className="text-blue-600 hover:text-blue-800">Stock</Link>
+                <Link to="/admin/customers" className="text-blue-600 hover:text-blue-800">Customers</Link>
+                <Link to="/admin/invoices" className="text-blue-600 hover:text-blue-800">Invoices</Link>
             </div>
-            <div className="center">
-                <h2>Customers</h2>
+
+            <div className="mt-6 bg-white p-6 rounded-md shadow-md">
+                <h2 className="text-xl font-bold text-gray-800">Customers</h2>
                 <input
                     type="text"
                     placeholder="Search by Phone or ID"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="inputfield"
+                    className="mt-4 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <hr />
-                <table>
+                <hr className="my-4" />
+
+                <table className="w-full table-auto border-collapse">
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Phone</th>
-                            <th>Edit</th>
-                            <th>Actions</th>
+                        <tr className="bg-gray-100">
+                            <th className="p-2 border text-left">ID</th>
+                            <th className="p-2 border text-left">Phone</th>
+                            <th className="p-2 border text-left">Edit</th>
+                            <th className="p-2 border text-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredCustomers.map(customer => (
-                            <tr key={customer.id}>
-                                <td>{customer.id}</td>
-                                <td>{customer.phone}</td>
-                                <td>
-                                    <Link to={`/admin/edit-customer/${customer.id}`}>Edit</Link>
+                            <tr key={customer.id} className="hover:bg-gray-50">
+                                <td className="p-2 border">{customer.id}</td>
+                                <td className="p-2 border">{customer.phone}</td>
+                                <td className="p-2 border">
+                                    <Link to={`/admin/edit-customer/${customer.id}`} className="text-blue-600 hover:text-blue-800">Edit</Link>
                                 </td>
-                                <td>
-                                    <Link to={`/customer/${customer.id}`}>View Invoices</Link>
+                                <td className="p-2 border">
+                                    <button 
+                                        onClick={() => handleViewInvoices(customer.id)} 
+                                        className="text-blue-600 hover:text-blue-800"
+                                    >
+                                        View Invoices
+                                    </button>
                                 </td>
                             </tr>
                         ))}
@@ -81,25 +88,25 @@ const Customers = () => {
                 </table>
 
                 {selectedCustomer && (
-                    <div>
-                        <h3>Invoices for Customer ID: {selectedCustomer}</h3>
-                        <table>
+                    <div className="mt-6 bg-gray-100 p-4 rounded-md">
+                        <h3 className="text-lg font-bold text-gray-700">Invoices for Customer ID: {selectedCustomer}</h3>
+                        <table className="w-full table-auto border-collapse mt-4">
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Total Amount</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
+                                <tr className="bg-gray-200">
+                                    <th className="p-2 border text-left">ID</th>
+                                    <th className="p-2 border text-left">Total Amount</th>
+                                    <th className="p-2 border text-left">Date</th>
+                                    <th className="p-2 border text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {invoices.map(invoice => (
-                                    <tr key={invoice.id}>
-                                        <td>{invoice.id}</td>
-                                        <td>₹{invoice.totalAmount}</td>
-                                        <td>{new Date(invoice.createdAt.seconds * 1000).toLocaleDateString()}</td>
-                                        <td>
-                                            <Link to={`/invoice/${invoice.id}`}>View</Link>
+                                    <tr key={invoice.id} className="hover:bg-gray-50">
+                                        <td className="p-2 border">{invoice.id}</td>
+                                        <td className="p-2 border">₹{invoice.totalAmount}</td>
+                                        <td className="p-2 border">{new Date(invoice.createdAt.seconds * 1000).toLocaleDateString()}</td>
+                                        <td className="p-2 border">
+                                            <Link to={`/invoice/${invoice.id}`} className="text-blue-600 hover:text-blue-800">View</Link>
                                         </td>
                                     </tr>
                                 ))}
