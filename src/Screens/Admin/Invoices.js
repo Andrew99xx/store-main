@@ -46,12 +46,10 @@ const Invoices = () => {
         invoices.forEach(invoice => {
             const invoiceDate = new Date(invoice.createdAt.seconds * 1000);
 
-            // Convert to IST timezone
             const invoiceDateIST = new Date(invoiceDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
             const currentDate = new Date();
             const currentDateIST = new Date(currentDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
-            // Determine the difference in days
             const diffInDays = Math.floor((currentDateIST - invoiceDateIST) / (1000 * 60 * 60 * 24));
 
             let category;
@@ -60,7 +58,7 @@ const Invoices = () => {
             } else if (diffInDays === 1) {
                 category = 'Yesterday';
             } else {
-                category = invoiceDateIST.toLocaleDateString(); // Use date as category
+                category = invoiceDateIST.toLocaleDateString();
             }
 
             if (!categorized[category]) {
@@ -75,26 +73,30 @@ const Invoices = () => {
     const categorizedInvoices = categorizeInvoices(sortedInvoices);
 
     return (
-        <div>
-            <div className='header'>
-                <Link to="/admin">Dashboard</Link>
-                <Link to="/admin/stock">Stock</Link>
-                <Link to="/admin/customers">Customers</Link>
-                <Link to="/admin/invoices">Invoices</Link>
+        <div className="p-4 bg-gray-50 min-h-screen">
+            <div className="flex space-x-4 bg-white p-4 shadow-md rounded-md">
+                <Link to="/admin" className="text-blue-600 hover:text-blue-800">Dashboard</Link>
+                <Link to="/admin/stock" className="text-blue-600 hover:text-blue-800">Stock</Link>
+                <Link to="/admin/customers" className="text-blue-600 hover:text-blue-800">Customers</Link>
+                <Link to="/admin/invoices" className="text-blue-600 hover:text-blue-800">Invoices</Link>
             </div>
 
-            <div className="center">
-                <h2>Invoices</h2>
+            <div className="mt-6 bg-white p-6 rounded-md shadow-md">
+                <h2 className="text-xl font-bold text-gray-800">Invoices</h2>
 
-                <div className="">
+                <div className="flex space-x-4 mt-4">
                     <input
                         type="text"
                         placeholder="Search by Invoice ID"
                         value={searchQuery}
                         onChange={handleSearch}
-                        className="inputfield"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <select value={sortOrder} onChange={handleSortChange} className="">
+                    <select
+                        value={sortOrder}
+                        onChange={handleSortChange}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
                         <option value="due">Due Amount</option>
@@ -102,17 +104,17 @@ const Invoices = () => {
                 </div>
 
                 {Object.keys(categorizedInvoices).map(category => (
-                    <div key={category}>
-                        <h3>{category}</h3>
-                        <table>
+                    <div key={category} className="mt-6">
+                        <h3 className="text-lg font-bold text-gray-700">{category}</h3>
+                        <table className="w-full table-auto border-collapse mt-4">
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Total Amount</th>
-                                    <th>GST Amount</th>
-                                    <th>GST Billing</th>
-                                    <th>Actions</th>
-                                    <th>Due Amount</th>
+                                <tr className="bg-gray-100">
+                                    <th className="p-2 border text-left">ID</th>
+                                    <th className="p-2 border text-left">Total Amount</th>
+                                    <th className="p-2 border text-left">GST Amount</th>
+                                    <th className="p-2 border text-left">GST Billing</th>
+                                    <th className="p-2 border text-left">Actions</th>
+                                    <th className="p-2 border text-left">Due Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -123,15 +125,17 @@ const Invoices = () => {
                                     const totalAmountWithGst = (totalAmount + gstAmount).toFixed(2);
                                     
                                     return (
-                                        <tr key={invoice.id}>
-                                            <td><Link to={`/invoice/${invoice.id}`}>{invoice.id}</Link></td>
-                                            <td>₹{totalAmountWithGst}</td>
-                                            <td>₹{gstAmount.toFixed(2)}</td>
-                                            <td>{gstAmount ? 'Yes' : 'No'}</td>
-                                            <td>
-                                                <Link to={`/admin/edit-invoice/${invoice.id}`}>Edit</Link>
+                                        <tr key={invoice.id} className="hover:bg-gray-50">
+                                            <td className="p-2 border">
+                                                <Link to={`/invoice/${invoice.id}`} className="text-blue-600 hover:text-blue-800">{invoice.id}</Link>
                                             </td>
-                                            <td>₹{dueAmount.toFixed(2)}</td>
+                                            <td className="p-2 border">₹{totalAmountWithGst}</td>
+                                            <td className="p-2 border">₹{gstAmount.toFixed(2)}</td>
+                                            <td className="p-2 border">{gstAmount ? 'Yes' : 'No'}</td>
+                                            <td className="p-2 border">
+                                                <Link to={`/admin/edit-invoice/${invoice.id}`} className="text-blue-600 hover:text-blue-800">Edit</Link>
+                                            </td>
+                                            <td className="p-2 border">₹{dueAmount.toFixed(2)}</td>
                                         </tr>
                                     );
                                 })}
