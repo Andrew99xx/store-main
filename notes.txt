@@ -1,0 +1,2 @@
+1. fixing creditor issue , no name visible = 
+2. tailwind setup = 

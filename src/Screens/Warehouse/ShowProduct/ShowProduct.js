@@ -1,6 +1,7 @@
-// src/ShowProducts.js
 import React, { useState, useEffect } from "react";
 import { db, collection, getDocs, doc, updateDoc } from "../../../firebase";
+import CustomButton from "../../../components/cssComponents/CustomButton.jsx";
+import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSubmit.jsx";
 
 const units = ["kg", "gram", "liter", "milliliter"];
 
@@ -12,6 +13,7 @@ const ShowProducts = () => {
   const [weight, setWeight] = useState("");
   const [unit, setUnit] = useState(units[0]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -28,10 +30,12 @@ const ShowProducts = () => {
     setPrice(product.price);
     setWeight(product.weight);
     setUnit(product.unit);
+    setShowModal(true); // Open the modal
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setShowModal(false);
     try {
       const productRef = doc(db, "products", editProduct.id);
       await updateDoc(productRef, {
@@ -40,13 +44,14 @@ const ShowProducts = () => {
         weight,
         unit,
       });
-      setEditProduct(null);
+      // Close the modal
       const updatedProducts = products.map(product =>
         product.id === editProduct.id
           ? { ...product, quantity, price, weight, unit }
           : product
       );
       setProducts(updatedProducts);
+      setEditProduct(null); // Clear selected product
     } catch (error) {
       console.error("Error updating product:", error);
       alert("Error updating product");
@@ -62,79 +67,110 @@ const ShowProducts = () => {
   );
 
   return (
-    <div className="center">
-      <h1>All Products</h1>
-      <input
-        type="text"
-        placeholder="Search products by name"
-        value={searchTerm}
-        onChange={handleSearchChange}
-      className="inputfield"
-      />
-      {filteredProducts.length > 0 ? (
-        <ol>
-          {filteredProducts.map(product => (
-            <li key={product.id} className="pd1">
+    <div className="w-full bg-gray-100 flex justify-center items-center">
+      <div className="flex w-full md:w-2/3 lg:w-1/2 flex-col gap-4 p-6">
+        <h1 className="text-3xl font-semibold text-gray-800">All Products</h1>
+        <input
+          type="text"
+          placeholder="Search products by name"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-full p-2 border border-gray-300 rounded-md"
+        />
+        {filteredProducts.length > 0 ? (
+          <div className="w-full flex flex-col gap-4">
+            {filteredProducts.map(product => (
+              <div
+                key={product.id}
+                className="w-full flex flex-row items-center justify-between gap-6 px-6 py-3 bg-white shadow-md rounded-md"
+              >
+                <div className="flex flex-1 flex-col gap-2">
+                  <p>Name : {product.name}</p>
+                  <p>Quantity : {product.quantity} units</p>
+                  <p>Price : @ ₹{product.price} each</p>
+                  <p>Weight : {product.weight} {product.unit} each</p>
+                </div>
+                <div className="flex-1">
 
-              {product.name} - {product.quantity} units @ ₹{product.price} each, {product.weight} {product.unit}‎ ‎ ‎ ‎ 
-              <button onClick={() => handleEdit(product)} className="btn">Edit</button>
-             
-            </li>
-           
-          ))}
-        </ol>
-      ) : (
-        <p>No products found</p>
-      )}
-      {editProduct && (
-        <div>
-          <h2>Edit Product</h2>
-          <form onSubmit={handleUpdate}>
-            <div>
-              <label>Quantity:</label>
-              <input
-              className="inputfield"
-              type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value))}
-                required
-              />
+                  <CustomButton
+                    onClick={() => handleEdit(product)}
+                  >
+                    Edit
+                  </CustomButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No products found</p>
+        )}
+
+        {/* Modal for editing product */}
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div className="bg-white p-6 rounded-md shadow-md w-full max-w-lg">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Edit Product</h2>
+              <form onSubmit={handleUpdate}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-1">Quantity:</label>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value))}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-1">Price:</label>
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(parseFloat(e.target.value))}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-1">Weight:</label>
+
+                  <div className="flex gap-2 justify-center items-center">
+                    <input
+                      type="number"
+                      value={weight}
+                      onChange={(e) => setWeight(parseFloat(e.target.value))}
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    />
+                    <select
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    >
+                      {units.map(unit => (
+                        <option key={unit} value={unit}>{unit}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-4">
+                  <CustomButtonSubmit
+                  >
+                    Update
+                  </CustomButtonSubmit>
+                  <CustomButton
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </CustomButton>
+                 
+                </div>
+              </form>
             </div>
-            <br />
-            <div>
-              <label>Price:</label>
-              <input
-              className="inputfield"
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(parseFloat(e.target.value))}
-                required
-              />
-            </div>
-            <br />
-            <div>
-              <label>Weight:</label>
-              <input
-                type="number"
-              className="inputfield"
-              value={weight}
-                onChange={(e) => setWeight(parseFloat(e.target.value))}
-                required
-              />
-              <select value={unit} onChange={(e) => setUnit(e.target.value)} required>
-                {units.map(unit => (
-                  <option key={unit} value={unit}>{unit}</option>
-                ))}
-              </select>
-            </div>
-            <br />
-            <div className="">
-            <button type="submit" className="btn">Update</button>
-            <button type="button" className="btn" onClick={() => setEditProduct(null)}>Cancel</button></div>
-          </form>
-          <br /><br />
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

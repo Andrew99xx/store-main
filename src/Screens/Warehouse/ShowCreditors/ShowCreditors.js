@@ -52,34 +52,57 @@ const ShowCreditors = () => {
   );
 
   return (
-    <div className="center">
-      <h1>All Creditors</h1>
-      <div>
-        <label>Sort by:</label>
-        <select value={sortOption} onChange={handleSortChange}>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <h1 className="text-3xl font-semibold text-center mb-6">All Creditors</h1>
+      
+      <div className="flex justify-center items-center mb-4">
+        <label className="mr-2">Sort by:</label>
+        <select
+          value={sortOption}
+          onChange={handleSortChange}
+          className="bg-gray-700 text-white p-2 rounded"
+        >
           <option value="name">Name</option>
           <option value="amount">Total Amount</option>
         </select>
       </div>
-      <br />
-      <input
-        type="text"
-        placeholder="Search creditors by name"
-        value={searchTerm}
-        className="inputfield"
-        onChange={handleSearchChange}
-      />
+      
+      <div className="flex justify-center mb-6">
+        <input
+          type="text"
+          placeholder="Search creditors by name"
+          value={searchTerm}
+          className="w-full max-w-md p-2 rounded bg-gray-700 text-white"
+          onChange={handleSearchChange}
+        />
+      </div>
+
       {filteredCreditors.length > 0 ? (
-        <ol>
+        <ol className="space-y-4">
           {filteredCreditors.map(creditor => (
-            <li key={creditor.id} className="pd1">
-             ID- {creditor.id} <br /> Name: {creditor.name} - {creditor.product} - {creditor.quantity} units @ ₹{creditor.price} each - Total: ₹{creditor.totalAmount}
-              <button onClick={() => handleDelete(creditor.id)}>Paid</button>
+            <li
+              key={creditor.id}
+              className="bg-gray-800 p-4 rounded shadow-md flex justify-between items-center"
+            >
+              <div>
+                <p>ID: {creditor.id}</p>
+                <p className="font-semibold">Name: {creditor.name}</p>
+                <p>
+                  {creditor.product} - {creditor.quantity} units @ ₹{creditor.price} each
+                </p>
+                <p>Total: ₹{creditor.totalAmount}</p>
+              </div>
+              <button
+                onClick={() => handleDelete(creditor.id)}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+              >
+                Paid
+              </button>
             </li>
           ))}
         </ol>
       ) : (
-        <p>No creditors found</p>
+        <p className="text-center mt-4">No creditors found</p>
       )}
     </div>
   );
