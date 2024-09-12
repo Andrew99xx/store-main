@@ -1,0 +1,2 @@
+1. no editing in product
+2. login & signup correct 
