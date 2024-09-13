@@ -52,15 +52,15 @@ const ShowCreditors = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="  p-6">
       <h1 className="text-3xl font-semibold text-center mb-6">All Creditors</h1>
       
       <div className="flex justify-center items-center mb-4">
-        <label className="mr-2">Sort by:</label>
+        <label className="mr-2 text-gray-700">Sort by:</label>
         <select
           value={sortOption}
           onChange={handleSortChange}
-          className="bg-gray-700 text-white p-2 rounded"
+          className="bg-gray-200 p-2 rounded text-gray-800"
         >
           <option value="name">Name</option>
           <option value="amount">Total Amount</option>
@@ -72,7 +72,7 @@ const ShowCreditors = () => {
           type="text"
           placeholder="Search creditors by name"
           value={searchTerm}
-          className="w-full max-w-md p-2 rounded bg-gray-700 text-white"
+          className="w-full max-w-md p-2 rounded border border-gray-300 text-gray-800"
           onChange={handleSearchChange}
         />
       </div>
@@ -82,15 +82,15 @@ const ShowCreditors = () => {
           {filteredCreditors.map(creditor => (
             <li
               key={creditor.id}
-              className="bg-gray-800 p-4 rounded shadow-md flex justify-between items-center"
+              className="bg-white p-4 rounded-md shadow-md flex justify-between items-center"
             >
               <div>
-                <p>ID: {creditor.id}</p>
-                <p className="font-semibold">Name: {creditor.name}</p>
-                <p>
+                <p className="text-gray-700">ID: {creditor.id}</p>
+                <p className="font-semibold text-gray-900">Name: {creditor.name}</p>
+                <p className="text-gray-700">
                   {creditor.product} - {creditor.quantity} units @ ₹{creditor.price} each
                 </p>
-                <p>Total: ₹{creditor.totalAmount}</p>
+                <p className="text-gray-700">Total: ₹{creditor.totalAmount}</p>
               </div>
               <button
                 onClick={() => handleDelete(creditor.id)}
@@ -102,7 +102,7 @@ const ShowCreditors = () => {
           ))}
         </ol>
       ) : (
-        <p className="text-center mt-4">No creditors found</p>
+        <p className="text-center text-gray-700 mt-4">No creditors found</p>
       )}
     </div>
   );
