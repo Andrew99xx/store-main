@@ -23,8 +23,8 @@ const AddCustomer = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-50 min-h-screen p-4">
-            <div className="bg-white shadow-md rounded-md w-full max-w-lg p-6">
+        <div className="flex flex-col items-center justify-center p-4">
+            <div className="w-full p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add Customer</h2>
                 <form className="space-y-4">
                     <div>
