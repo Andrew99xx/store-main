@@ -39,7 +39,7 @@ const Customers = () => {
 
     return (
         <div className="p-4 bg-gray-50 min-h-screen">
-            <div className="flex space-x-4 bg-white p-4 shadow-md rounded-md">
+            <div className="flex justify-center items-center space-x-4 bg-white p-4 shadow-md rounded-md">
                 <Link to="/admin" className="text-blue-600 hover:text-blue-800">Dashboard</Link>
                 <Link to="/admin/stock" className="text-blue-600 hover:text-blue-800">Stock</Link>
                 <Link to="/admin/customers" className="text-blue-600 hover:text-blue-800">Customers</Link>
