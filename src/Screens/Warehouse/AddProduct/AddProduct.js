@@ -140,12 +140,12 @@ const AddProduct = () => {
 
 
   return (
-    <div className="bg-gray-100 w-full flex justify-center items-center">
-      <div className="p-6 w-full md:w-2/3 lg:w-1/2 text-gray-900 flex flex-col gap-6 items-center justify-start ">
-        <h1 className="text-3xl w-full text-gray-800 font-semibold">Add Product</h1>
+    <div className=" w-full flex justify-center items-center">
+      <div className="p-6 w-full text-gray-900 flex flex-col gap-6 items-center justify-start ">
+        <h1 className="px-4 text-3xl w-full text-gray-800 font-semibold">Add Product</h1>
         <form
           onSubmit={handleSubmit}
-          className="w-full rounded-md shadow-md px-4 py-6 bg-white flex flex-col gap-8"
+          className="w-full px-4 py-6 bg-white flex flex-col gap-8"
         >
           <div className={itemWrapper}>
             <p className={itemName}>Product Name:</p>

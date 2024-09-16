@@ -1,4 +1,4 @@
-.app .header{
+/* .app .header{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,17 +31,5 @@
     display: flex;
     align-items: flex-start   ;
     justify-content: center;
-}
+} */
 
-.react-autosuggest__suggestions-container .react-autosuggest__suggestion{
-    padding: 10px;
-    background-color: aliceblue;
-    border-bottom: 1px solid black;
-    
-}
-.react-autosuggest__suggestions-container .react-autosuggest__suggestion:hover{
-    padding: 10px;
-    background-color: rgb(53, 94, 130);
-    cursor: pointer;
-    
-}

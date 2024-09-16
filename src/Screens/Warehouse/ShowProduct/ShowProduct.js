@@ -67,8 +67,8 @@ const ShowProducts = () => {
   );
 
   return (
-    <div className="w-full bg-gray-100 flex justify-center items-center">
-      <div className="flex w-full md:w-2/3 lg:w-1/2 flex-col gap-4 p-6">
+    <div className="w-full flex justify-center items-center">
+      <div className="flex w-full  flex-col gap-4 p-6">
         <h1 className="text-3xl font-semibold text-gray-800">All Products</h1>
         <input
           type="text"

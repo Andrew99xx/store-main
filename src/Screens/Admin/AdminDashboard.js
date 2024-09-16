@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db, collection, getDocs, query, where } from '../../firebase';
 import { Link } from 'react-router-dom';
-import './Admin.css';
 
 const AdminDashboard = () => {
   const [totalSales, setTotalSales] = useState({ today: 0, week: 0, month: 0 });
@@ -19,7 +18,6 @@ const AdminDashboard = () => {
         startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        // Fetch invoices data
         const invoicesQuery = query(collection(db, 'invoices'), where('createdAt', '>=', startOfMonth));
         const invoicesSnap = await getDocs(invoicesQuery);
         const invoices = invoicesSnap.docs.map(doc => ({
@@ -28,29 +26,17 @@ const AdminDashboard = () => {
           createdAt: doc.data().createdAt.toDate(),
         }));
 
-        // Initialize variables for calculations
-        let todaySales = 0;
-        let weekSales = 0;
-        let monthSales = 0;
-        let todayCash = 0;
-        let weekCash = 0;
-        let monthCash = 0;
-        let todayUpi = 0;
-        let weekUpi = 0;
-        let monthUpi = 0;
-        let todayInvoices = 0;
-        let weekInvoices = 0;
-        let monthInvoices = 0;
-        let todayCustomers = new Set();
-        let weekCustomers = new Set();
-        let monthCustomers = new Set();
+        let todaySales = 0, weekSales = 0, monthSales = 0;
+        let todayCash = 0, weekCash = 0, monthCash = 0;
+        let todayUpi = 0, weekUpi = 0, monthUpi = 0;
+        let todayInvoices = 0, weekInvoices = 0, monthInvoices = 0;
+        let todayCustomers = new Set(), weekCustomers = new Set(), monthCustomers = new Set();
         let totalDue = 0;
 
         invoices.forEach(invoice => {
           const invoiceDate = invoice.createdAt;
-          const invoiceAmount = invoice.totalAmount + (invoice.gstAmount || 0); // Add GST amount
+          const invoiceAmount = invoice.totalAmount + (invoice.gstAmount || 0);
 
-          // Sales calculations
           if (invoiceDate.toDateString() === today.toDateString()) {
             todaySales += invoiceAmount;
             todayInvoices++;
@@ -64,32 +50,18 @@ const AdminDashboard = () => {
             monthInvoices++;
           }
 
-          // Payment calculations
           if (invoice.paymentStatus === 'paid') {
             if (invoice.paymentMethod === 'cash') {
-              if (invoiceDate.toDateString() === today.toDateString()) {
-                todayCash += invoiceAmount;
-              }
-              if (invoiceDate >= startOfWeek) {
-                weekCash += invoiceAmount;
-              }
-              if (invoiceDate >= startOfMonth) {
-                monthCash += invoiceAmount;
-              }
+              if (invoiceDate.toDateString() === today.toDateString()) todayCash += invoiceAmount;
+              if (invoiceDate >= startOfWeek) weekCash += invoiceAmount;
+              if (invoiceDate >= startOfMonth) monthCash += invoiceAmount;
             } else if (invoice.paymentMethod === 'upi_card') {
-              if (invoiceDate.toDateString() === today.toDateString()) {
-                todayUpi += invoiceAmount;
-              }
-              if (invoiceDate >= startOfWeek) {
-                weekUpi += invoiceAmount;
-              }
-              if (invoiceDate >= startOfMonth) {
-                monthUpi += invoiceAmount;
-              }
+              if (invoiceDate.toDateString() === today.toDateString()) todayUpi += invoiceAmount;
+              if (invoiceDate >= startOfWeek) weekUpi += invoiceAmount;
+              if (invoiceDate >= startOfMonth) monthUpi += invoiceAmount;
             }
           }
 
-          // Customers
           todayCustomers.add(invoice.customerId);
           weekCustomers.add(invoice.customerId);
           monthCustomers.add(invoice.customerId);
@@ -131,45 +103,49 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className='admin'>
-      <div className='header'>
-        <Link to='/admin'>Dashboard</Link>
-        <Link to='/admin/stock'>Stock</Link>
-        <Link to='/admin/customers'>Customers</Link>
-        <Link to='/admin/invoices'>Invoices</Link>
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <div className="flex justify-center items-center space-x-4 bg-white p-4 shadow-md rounded-md">
+        <Link to="/admin" className="text-blue-600 hover:text-blue-800">Dashboard</Link>
+        <Link to="/admin/stock" className="text-blue-600 hover:text-blue-800">Stock</Link>
+        <Link to="/admin/customers" className="text-blue-600 hover:text-blue-800">Customers</Link>
+        <Link to="/admin/invoices" className="text-blue-600 hover:text-blue-800">Invoices</Link>
       </div>
 
-      <div className='adminbody'>
-        <h2>Admin Dashboard</h2>
+      <div className="mt-6 bg-white p-6 rounded-md shadow-md">
+        <h2 className="text-xl font-bold text-gray-800">Admin Dashboard</h2>
 
-        <div>
-          <hr />
-
-          <div className="totalsales">
-            <h1>Total sales</h1>
+        <div className="mt-4 space-y-6">
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h1 className="text-lg font-semibold text-gray-700">Total Sales</h1>
             <p>Total Sales Today: ₹{totalSales.today.toFixed(2)}</p>
             <p>Total Sales This Month: ₹{totalSales.month.toFixed(2)}</p>
           </div>
-          <hr />
-          <div className="totalpayment">
-            <h1>Total Payment</h1>
-            <h3>Cash</h3>
+
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h1 className="text-lg font-semibold text-gray-700">Total Payment</h1>
+            <h3 className="font-medium">Cash</h3>
             <p>Cash Payments Today: ₹{cashPayments.today.toFixed(2)}</p>
             <p>Cash Payments This Month: ₹{cashPayments.month.toFixed(2)}</p>
-            <h3>Upi/Card</h3>
+            <h3 className="font-medium">UPI/Card</h3>
             <p>UPI Payments Today: ₹{upiPayments.today.toFixed(2)}</p>
             <p>UPI Payments This Month: ₹{upiPayments.month.toFixed(2)}</p>
           </div>
-          <hr />
-          <h1>Total Payment Due</h1>
-          <p>Total Due Amount: ₹{totalDueAmount.toFixed(2)}</p>
-          <hr />
-          <h1> Total customers</h1>
-          <p>Total Customers: {totalCustomers.today}</p>
-          <hr />
-          <h1>Total Bills</h1>
-          <p>Total Invoices Today: {totalInvoices.today}</p>
-          <p>Total Invoices This Month: {totalInvoices.month}</p>
+
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h1 className="text-lg font-semibold text-gray-700">Total Payment Due</h1>
+            <p>Total Due Amount: ₹{totalDueAmount.toFixed(2)}</p>
+          </div>
+
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h1 className="text-lg font-semibold text-gray-700">Total Customers</h1>
+            <p>Total Customers Today: {totalCustomers.today}</p>
+          </div>
+
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h1 className="text-lg font-semibold text-gray-700">Total Bills</h1>
+            <p>Total Invoices Today: {totalInvoices.today}</p>
+            <p>Total Invoices This Month: {totalInvoices.month}</p>
+          </div>
         </div>
       </div>
     </div>

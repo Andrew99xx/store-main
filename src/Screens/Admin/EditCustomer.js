@@ -1,7 +1,6 @@
-// EditCustomer.js
 import React, { useState, useEffect } from 'react';
-import { db, doc, updateDoc, deleteDoc,getDoc } from '../../firebase';
-import { useParams, useNavigate,Link } from 'react-router-dom';
+import { db, doc, updateDoc, deleteDoc, getDoc } from '../../firebase';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const EditCustomer = () => {
     const { customerId } = useParams();
@@ -49,21 +48,68 @@ const EditCustomer = () => {
     };
 
     return customer ? (
-        <div className='center'>
+        <div className="flex flex-col items-center justify-center bg-gray-50 min-h-screen p-4">
+            <div className="bg-white shadow-md rounded-md w-full max-w-lg p-6">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Customer</h1>
+                <form className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700 mb-1">Customer's Name</label>
+                        <input 
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="text" 
+                            value={name} 
+                            onChange={(e) => setName(e.target.value)} 
+                        />
+                    </div>
 
-            <h1>Edit Customer</h1>
+                    <div>
+                        <label className="block text-gray-700 mb-1">Customer's Phone</label>
+                        <input 
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="text" 
+                            value={phone} 
+                            onChange={(e) => setPhone(e.target.value)} 
+                        />
+                    </div>
 
-            <label> Customers Phone</label>
-            <input className='inputfield' type="text" value={phone} onChange={(e) => setPhone(e.target.value)} />
-            <br />
-            <div className=""> <button onClick={handleUpdate} className="btn">Update Customer</button>
-            <button onClick={handleDelete} className="btn">Delete Customer</button></div>
-            <Link className="btn" to={"/admin/customers"}>Back</Link>
+                    <div>
+                        <label className="block text-gray-700 mb-1">Customer's Email</label>
+                        <input 
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="email" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                        />
+                    </div>
 
-           
+                    <div className="flex space-x-4 mt-4">
+                        <button 
+                            onClick={handleUpdate} 
+                            type="button"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full"
+                        >
+                            Update Customer
+                        </button>
+                        <button 
+                            onClick={handleDelete} 
+                            type="button"
+                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full"
+                        >
+                            Delete Customer
+                        </button>
+                    </div>
+                </form>
+
+                <Link 
+                    to="/admin/customers" 
+                    className="mt-6 inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-center w-full"
+                >
+                    Back
+                </Link>
+            </div>
         </div>
     ) : (
-        <div>Loading...</div>
+        <div className="flex justify-center items-center min-h-screen text-gray-700">Loading...</div>
     );
 };
 

@@ -1,14 +1,13 @@
-// EditInvoice.js
 import React, { useState, useEffect } from 'react';
 import { db, doc, updateDoc, deleteDoc, getDoc } from '../../firebase';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const EditInvoice = () => {
     const { invoiceId } = useParams();
     const [invoice, setInvoice] = useState(null);
     const [customerName, setCustomerName] = useState('');
     const [totalAmount, setTotalAmount] = useState(0);
-    const [dueAmount, setDueAmount] = useState(0); // New state for due amount
+    const [dueAmount, setDueAmount] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,7 +18,7 @@ const EditInvoice = () => {
                 setInvoice(invoiceData);
                 setCustomerName(invoiceData.customerName);
                 setTotalAmount(invoiceData.totalAmount);
-                setDueAmount(invoiceData.dueAmount || 0); // Set due amount, default to 0 if not set
+                setDueAmount(invoiceData.dueAmount || 0);
             } catch (error) {
                 console.error('Error fetching invoice: ', error);
             }
@@ -30,22 +29,19 @@ const EditInvoice = () => {
 
     const handleUpdate = async () => {
         try {
-            // Update the invoice
             await updateDoc(doc(db, 'invoices', invoiceId), {
                 customerName,
                 totalAmount: parseFloat(totalAmount),
-                dueAmount: parseFloat(dueAmount), // Update due amount
+                dueAmount: parseFloat(dueAmount),
             });
 
-            // If invoice is associated with a customer, update the customer's due amount
             if (invoice.customerId) {
                 const customerDoc = doc(db, 'customers', invoice.customerId);
                 const customerData = (await getDoc(customerDoc)).data();
 
-                // Update customer's due amount in paymentAmounts map
                 const newPaymentAmounts = {
                     ...customerData.paymentAmounts,
-                    upi_card: parseFloat(dueAmount) || 0, // Update upi_card payment amount
+                    upi_card: parseFloat(dueAmount) || 0,
                 };
 
                 await updateDoc(customerDoc, {
@@ -72,22 +68,68 @@ const EditInvoice = () => {
     };
 
     return invoice ? (
-        <div className='center'>
-            <h2>Edit Invoice</h2>
-            <h2>ID - {invoiceId}</h2>
-            <p>Customer Number</p>
-            <input type="text" className='inputfield' value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
-            <p>Bill Amount</p>
-            <input type="number" className='inputfield' value={totalAmount} onChange={(e) => setTotalAmount(e.target.value)} />
-            <p>Due amount</p>
-            <input type="number" className='inputfield' value={dueAmount} onChange={(e) => setDueAmount(e.target.value)} />
-            <br />
-            <div className="">
-            <button onClick={handleUpdate} className="btn">Update Invoice</button>
-            <button onClick={handleDelete} className="btn">Delete Invoice</button></div>
+        <div className="flex flex-col items-center justify-center bg-gray-50 min-h-screen p-4">
+            <div className="bg-white shadow-md rounded-md w-full max-w-lg p-6">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Invoice</h1>
+                <form className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700 mb-1">Customer Name</label>
+                        <input
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="text"
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-gray-700 mb-1">Bill Amount</label>
+                        <input
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="number"
+                            value={totalAmount}
+                            onChange={(e) => setTotalAmount(e.target.value)}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-gray-700 mb-1">Due Amount</label>
+                        <input
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="number"
+                            value={dueAmount}
+                            onChange={(e) => setDueAmount(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="flex space-x-4 mt-4">
+                        <button
+                            onClick={handleUpdate}
+                            type="button"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full"
+                        >
+                            Update Invoice
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            type="button"
+                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full"
+                        >
+                            Delete Invoice
+                        </button>
+                    </div>
+                </form>
+                
+                <Link 
+                    to="/admin/invoices" 
+                    className="mt-6 inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-center w-full"
+                >
+                    Back
+                </Link>
+            </div>
         </div>
     ) : (
-        <div>Loading...</div>
+        <div className="flex justify-center items-center min-h-screen text-gray-700">Loading...</div>
     );
 };
 

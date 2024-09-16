@@ -12,7 +12,6 @@ import {
 } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import Autosuggest from "react-autosuggest"; // Import react-autosuggest
-import "./Makebill.css";
 
 const MakeBill = () => {
   const [customers, setCustomers] = useState([]);
