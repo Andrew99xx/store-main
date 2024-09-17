@@ -19,7 +19,7 @@ const CustomerInvoices = () => {
 
                 const q = query(collection(db, 'invoices'), where('customerId', '==', customerId));
                 const invoicesSnap = await getDocs(q);
-                
+
                 const invoicesData = invoicesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setInvoices(invoicesData);
                 setLoading(false); // Stop loading when data is fetched
@@ -34,6 +34,8 @@ const CustomerInvoices = () => {
             fetchInvoices();
         }
     }, [customerId]);
+
+   
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -53,6 +55,8 @@ const CustomerInvoices = () => {
         }
     });
 
+    console.log(sortedInvoices)
+
     if (loading) {
         return <div className="text-center mt-4">Loading invoices...</div>;
     }
@@ -62,8 +66,8 @@ const CustomerInvoices = () => {
     }
 
     return (
-        <div className="flex flex-col items-center bg-gray-50 min-h-screen p-4">
-            <div className="bg-white shadow-md rounded-md w-full max-w-4xl p-6">
+        <div className="flex flex-col items-center min-h-screen p-4">
+            <div className=" w-full max-w-4xl p-6">
                 <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                     Invoices for Customer: {customerId}
                 </h1>
@@ -85,12 +89,12 @@ const CustomerInvoices = () => {
                     </select>
                 </div>
 
-                <Link
+                {/* <Link
                     to="/admin/customers"
                     className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 mb-6 inline-block"
                 >
                     Back
-                </Link>
+                </Link> */}
 
                 {sortedInvoices.length > 0 ? (
                     sortedInvoices.map(invoice => {
@@ -116,19 +120,25 @@ const CustomerInvoices = () => {
                                     </>
                                 )}
 
-                                <h4 className="text-gray-700 mt-4">Products</h4>
+                                <hr className='my-4' />
+                                <h4 className="text-gray-700 text-xl font-bold">Products</h4>
                                 <ol className="list-decimal list-inside">
-                                    {invoice.products.map(product => (
-                                        <li key={product.productId} className="mt-2">
-                                            <div className="text-gray-700">
-                                                <p><strong>Product Name:</strong> {product.productName}</p>
-                                                <p><strong>Quantity:</strong> {product.quantity}</p>
-                                                <p><strong>Price:</strong> ₹{product.price.toFixed(2)}</p>
-                                            </div>
-                                        </li>
-                                    ))}
+                                    {!invoice.products || !Array.isArray(invoice.products) ? (
+                                        <li className="text-red-500">No products available</li>
+                                    ) : invoice.products.length === 0 ? (
+                                        <li className="text-red-500">No products found</li>
+                                    ) : (
+                                        invoice.products.map((product) => (
+                                            <li key={product.productId || Math.random()} className="mt-2">
+                                                <div className="text-gray-700">
+                                                    <p><strong>Product Name:</strong> {product.productName || "NA"}</p>
+                                                    <p><strong>Quantity:</strong> {product.quantity ? product.quantity : "NA"}</p>
+                                                    <p><strong>Price:</strong> {product.price ? `₹${product.price.toFixed(2)}` : "NA"}</p>
+                                                </div>
+                                            </li>
+                                        ))
+                                    )}
                                 </ol>
-                                <hr className="mt-4" />
                             </div>
                         );
                     })

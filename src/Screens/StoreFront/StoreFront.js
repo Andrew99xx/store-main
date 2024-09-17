@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import AddCustomer from './AddCustomer';
 import MakeBill from './MakeBill';
-import CustomerInvoices from './CustomerInvoices';
-import ShowInvoice from './ShowInvoice';
+import InvoiceFront from "./InvoiceFront"
+import CustomerAll from './CustomerAll';
 
 const StoreFront = () => {
   const [activeTab, setActiveTab] = useState('makeBill'); // Default tab
@@ -13,10 +13,10 @@ const StoreFront = () => {
         return <MakeBill />;
       case 'addCustomer':
         return <AddCustomer />;
-      case 'customerInvoices':
-        return <CustomerInvoices />;
-      case 'showInvoice':
-        return <ShowInvoice />;
+      case 'customerAll':
+        return <CustomerAll />;
+      case 'invoiceFront':
+        return <InvoiceFront />;
       default:
         return <MakeBill />;
     }
@@ -40,16 +40,16 @@ const StoreFront = () => {
             Add Customer
           </button>
           <button
-            className={`px-4 py-2 rounded-md ${activeTab === 'customerInvoices' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-            onClick={() => setActiveTab('customerInvoices')}
+            className={`px-4 py-2 rounded-md ${activeTab === 'customerAll' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+            onClick={() => setActiveTab('customerAll')}
           >
-            Customer Invoices
+            Customers
           </button>
           <button
-            className={`px-4 py-2 rounded-md ${activeTab === 'showInvoice' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-            onClick={() => setActiveTab('showInvoice')}
+            className={`px-4 py-2 rounded-md ${activeTab === 'invoiceFront' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+            onClick={() => setActiveTab('invoiceFront')}
           >
-            Show Invoice
+            Invoices
           </button>
         </div>
       </div>

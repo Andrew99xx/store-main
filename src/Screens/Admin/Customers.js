@@ -8,6 +8,7 @@ const Customers = () => {
     const [invoices, setInvoices] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredCustomers, setFilteredCustomers] = useState([]);
+    const [showModal, setShowModal] = useState(false); // New state to handle modal visibility
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -35,6 +36,13 @@ const Customers = () => {
         const invoicesData = invoicesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setSelectedCustomer(customerId);
         setInvoices(invoicesData);
+        setShowModal(true); // Open modal when a customer is selected
+    };
+
+    const closeModal = () => {
+        setShowModal(false); // Close modal when the close button is clicked
+        setSelectedCustomer(null);
+        setInvoices([]);
     };
 
     return (
@@ -69,14 +77,14 @@ const Customers = () => {
                     <tbody>
                         {filteredCustomers.map(customer => (
                             <tr key={customer.id} className="hover:bg-gray-50">
-                                <td className="p-2 border">{customer.id}</td>
-                                <td className="p-2 border">{customer.phone}</td>
+                                <td className="p-2 border">{customer.id || 'N/A'}</td>
+                                <td className="p-2 border">{customer.phone || 'N/A'}</td>
                                 <td className="p-2 border">
                                     <Link to={`/admin/edit-customer/${customer.id}`} className="text-blue-600 hover:text-blue-800">Edit</Link>
                                 </td>
                                 <td className="p-2 border">
-                                    <button 
-                                        onClick={() => handleViewInvoices(customer.id)} 
+                                    <button
+                                        onClick={() => handleViewInvoices(customer.id)}
                                         className="text-blue-600 hover:text-blue-800"
                                     >
                                         View Invoices
@@ -86,10 +94,20 @@ const Customers = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
 
-                {selectedCustomer && (
-                    <div className="mt-6 bg-gray-100 p-4 rounded-md">
-                        <h3 className="text-lg font-bold text-gray-700">Invoices for Customer ID: {selectedCustomer}</h3>
+            {showModal && (
+                <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full m-16 h-full overflow-y-scroll">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-lg font-bold text-gray-700">Invoices for Customer ID: {selectedCustomer}</h3>
+                            <button
+                                className="text-red-600 hover:text-red-800 font-bold text-3xl"
+                                onClick={closeModal}
+                            >
+                                X
+                            </button>
+                        </div>
                         <table className="w-full table-auto border-collapse mt-4">
                             <thead>
                                 <tr className="bg-gray-200">
@@ -100,21 +118,30 @@ const Customers = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {invoices.map(invoice => (
-                                    <tr key={invoice.id} className="hover:bg-gray-50">
-                                        <td className="p-2 border">{invoice.id}</td>
-                                        <td className="p-2 border">₹{invoice.totalAmount}</td>
-                                        <td className="p-2 border">{new Date(invoice.createdAt.seconds * 1000).toLocaleDateString()}</td>
-                                        <td className="p-2 border">
-                                            <Link to={`/invoice/${invoice.id}`} className="text-blue-600 hover:text-blue-800">View</Link>
-                                        </td>
+                                {invoices.length > 0 ? (
+                                    invoices.map(invoice => (
+                                        <tr key={invoice.id} className="hover:bg-gray-50">
+                                            <td className="p-2 border">{invoice.id || 'N/A'}</td>
+                                            <td className="p-2 border">₹{invoice.totalAmount || 'N/A'}</td>
+                                            <td className="p-2 border">
+                                                {invoice.createdAt ? new Date(invoice.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                            </td>
+                                            <td className="p-2 border">
+                                                <Link to={`/invoice/${invoice.id}`} className="text-blue-600 hover:text-blue-800">View</Link>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td className="p-2 border text-center" colSpan="4">No invoices found</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+            
         </div>
     );
 };
