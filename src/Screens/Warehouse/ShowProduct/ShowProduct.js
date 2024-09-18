@@ -90,14 +90,14 @@ const ShowProducts = () => {
                   <p>Price : @ ₹{product.price} each</p>
                   <p>Weight : {product.weight} {product.unit} each</p>
                 </div>
-                <div className="flex-1">
+                {/* <div className="flex-1">
 
                   <CustomButton
                     onClick={() => handleEdit(product)}
                   >
                     Edit
                   </CustomButton>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
@@ -105,7 +105,7 @@ const ShowProducts = () => {
           <p className="text-gray-600">No products found</p>
         )}
 
-        {/* Modal for editing product */}
+        {/* Modal for editing product - currently edit button is off */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div className="bg-white p-6 rounded-md shadow-md w-full max-w-lg">
@@ -170,6 +170,8 @@ const ShowProducts = () => {
             </div>
           </div>
         )}
+
+
       </div>
     </div>
   );
