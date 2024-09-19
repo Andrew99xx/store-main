@@ -47,6 +47,7 @@ const CustomerAll = () => {
                     <thead>
                         <tr className="bg-gray-100">
                             <th className="p-2 border text-left">Customer ID</th>
+                            <th className="p-2 border text-left">Customer Name</th>
                             <th className="p-2 border text-left">Customer Phone</th>
                             <th className="p-2 border text-left">Customer invoices</th>
                         </tr>
@@ -55,6 +56,7 @@ const CustomerAll = () => {
                         {filteredCustomers.map(customer => (
                             <tr key={customer.id} className="hover:bg-gray-50">
                                 <td className="p-2 border">{customer.id || 'N/A'}</td>
+                                <td className="p-2 border">{customer.name || 'N/A'}</td>
                                 <td className="p-2 border">{customer.phone || 'N/A'}</td>
                                 <td className="p-2 border">
                                     <Link
