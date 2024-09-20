@@ -52,30 +52,36 @@ const ShowCreditors = () => {
   );
 
   return (
-    <div className="  p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">All Creditors</h1>
-      
-      <div className="flex justify-center items-center mb-4">
-        <label className="mr-2 text-gray-700">Sort by:</label>
-        <select
-          value={sortOption}
-          onChange={handleSortChange}
-          className="bg-gray-200 p-2 rounded text-gray-800"
-        >
-          <option value="name">Name</option>
-          <option value="amount">Total Amount</option>
-        </select>
+    <div className="p-6">
+      <h1 className="text-3xl font-semibold mb-6">All Creditors</h1>
+
+
+      <div className="w-full flex mb-6 gap-4 justify-center items-center">
+        <div className="flex flex-1 justify-center">
+          <input
+            type="text"
+            placeholder="Search creditors by name"
+            value={searchTerm}
+            className="w-full p-2 rounded border border-gray-300 text-gray-800"
+            onChange={handleSearchChange}
+          />
+        </div>
+
+        <div className="flex justify-center items-center">
+          <label className="mr-2 text-gray-700">Sort by:</label>
+          <select
+            value={sortOption}
+            onChange={handleSortChange}
+            className="bg-gray-200 p-2 rounded text-gray-800"
+          >
+            <option value="name">Name</option>
+            <option value="amount">Total Amount</option>
+          </select>
+        </div>
+
       </div>
-      
-      <div className="flex justify-center mb-6">
-        <input
-          type="text"
-          placeholder="Search creditors by name"
-          value={searchTerm}
-          className="w-full max-w-md p-2 rounded border border-gray-300 text-gray-800"
-          onChange={handleSearchChange}
-        />
-      </div>
+
+
 
       {filteredCreditors.length > 0 ? (
         <ol className="space-y-4">
@@ -87,10 +93,7 @@ const ShowCreditors = () => {
               <div>
                 <p className="text-gray-700">ID: {creditor.id}</p>
                 <p className="font-semibold text-gray-900">Name: {creditor.name}</p>
-                <p className="text-gray-700">
-                  {creditor.product} - {creditor.quantity} units @ ₹{creditor.price} each
-                </p>
-                <p className="text-gray-700">Total: ₹{creditor.totalAmount}</p>
+
               </div>
               <button
                 onClick={() => handleDelete(creditor.id)}
