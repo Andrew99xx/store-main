@@ -267,7 +267,7 @@ const MakeBill = () => {
           className=" border rounded px-3 py-2 w-full mb-4 text-gray-700"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <h4 className="text-md font-medium mb-2 text-gray-600">Top picks</h4>
+        <h4 className="text-md font-medium mb-2 text-gray-600">Top Products</h4>
         <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
           <thead>
             <tr className="bg-gray-200 text-gray-700">

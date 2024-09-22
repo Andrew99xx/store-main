@@ -36,7 +36,7 @@ const Stock = () => {
             </div>
 
             <div className="mt-6 bg-white p-6 rounded-md shadow-md">
-                <h2 className="text-xl font-bold text-gray-800">Stock</h2>
+                <h2 className="text-xl font-bold text-gray-800">Stock or Products</h2>
                 <input
                     type="text"
                     placeholder="Search by ID or Name"
