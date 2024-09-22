@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { db, collection, addDoc } from '../../firebase';
+import {
+    db, collection, addDoc, query, getDocs, where
+} from '../../firebase';
 
 const AddCustomer = () => {
     const [customerData, setCustomerData] = useState({
@@ -26,6 +28,14 @@ const AddCustomer = () => {
         }
 
         try {
+            // check if phone number already exists with any other user
+            const q = query(collection(db, 'customers'), where('phone', '==', phone));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                alert('This phone number already exists with other users.');
+                return;
+            }
             await addDoc(collection(db, 'customers'), { name, phone, email });
             setCustomerData({ name: '', phone: '', email: '' });
             alert('Customer added successfully');
