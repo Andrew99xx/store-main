@@ -8,16 +8,17 @@ const Customers = () => {
     const [invoices, setInvoices] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredCustomers, setFilteredCustomers] = useState([]);
-    const [showModal, setShowModal] = useState(false); // New state to handle modal visibility
+    const [showModal, setShowModal] = useState(false); 
+    // New state to handle modal visibility
 
     useEffect(() => {
         const fetchCustomers = async () => {
             const customersSnap = await getDocs(collection(db, 'customers'));
             const customersData = customersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setCustomers(customersData);
-            setFilteredCustomers(customersData); // Initialize filteredCustomers with all customers
+            setFilteredCustomers(customersData); 
+            // Initialize filteredCustomers with all customers
         };
-
         fetchCustomers();
     }, []);
 
@@ -36,11 +37,13 @@ const Customers = () => {
         const invoicesData = invoicesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setSelectedCustomer(customerId);
         setInvoices(invoicesData);
-        setShowModal(true); // Open modal when a customer is selected
+        setShowModal(true); 
+        // Open modal when a customer is selected
     };
 
     const closeModal = () => {
-        setShowModal(false); // Close modal when the close button is clicked
+        setShowModal(false); 
+        // Close modal when the close button is clicked
         setSelectedCustomer(null);
         setInvoices([]);
     };
@@ -68,7 +71,8 @@ const Customers = () => {
                 <table className="w-full table-auto border-collapse">
                     <thead>
                         <tr className="bg-gray-100">
-                            <th className="p-2 border text-left">ID</th>
+                            <th className="p-2 border text-left">Customer ID</th>
+                            <th className="p-2 border text-left">Customer Name</th>
                             <th className="p-2 border text-left">Phone</th>
                             <th className="p-2 border text-left">Edit</th>
                             <th className="p-2 border text-left">Actions</th>
@@ -78,6 +82,7 @@ const Customers = () => {
                         {filteredCustomers.map(customer => (
                             <tr key={customer.id} className="hover:bg-gray-50">
                                 <td className="p-2 border">{customer.id || 'N/A'}</td>
+                                <td className="p-2 border">{customer.name || 'N/A'}</td>
                                 <td className="p-2 border">{customer.phone || 'N/A'}</td>
                                 <td className="p-2 border">
                                     <Link to={`/admin/edit-customer/${customer.id}`} className="text-blue-600 hover:text-blue-800">Edit</Link>

@@ -13,7 +13,6 @@ const Invoices = () => {
             const invoicesData = invoicesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setInvoices(invoicesData);
         };
-
         fetchInvoices();
     }, []);
 
@@ -45,11 +44,9 @@ const Invoices = () => {
 
         invoices.forEach(invoice => {
             const invoiceDate = new Date(invoice.createdAt.seconds * 1000);
-
             const invoiceDateIST = new Date(invoiceDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
             const currentDate = new Date();
             const currentDateIST = new Date(currentDate.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-
             const diffInDays = Math.floor((currentDateIST - invoiceDateIST) / (1000 * 60 * 60 * 24));
 
             let category;
@@ -66,7 +63,6 @@ const Invoices = () => {
             }
             categorized[category].push(invoice);
         });
-
         return categorized;
     };
 
@@ -80,10 +76,8 @@ const Invoices = () => {
                 <Link to="/admin/customers" className="text-blue-600 hover:text-blue-800">Customers</Link>
                 <Link to="/admin/invoices" className="text-blue-600 hover:text-blue-800">Invoices</Link>
             </div>
-
             <div className="mt-6 bg-white p-6 rounded-md shadow-md">
                 <h2 className="text-xl font-bold text-gray-800">Invoices</h2>
-
                 <div className="flex space-x-4 mt-4">
                     <input
                         type="text"
@@ -102,7 +96,6 @@ const Invoices = () => {
                         <option value="due">Due Amount</option>
                     </select>
                 </div>
-
                 {Object.keys(categorizedInvoices).map(category => (
                     <div key={category} className="mt-6">
                         <h3 className="text-lg font-bold text-gray-700">{category}</h3>

@@ -97,7 +97,6 @@ const AdminDashboard = () => {
         console.error('Error fetching due amount:', error);
       }
     };
-
     fetchMetricsData();
     fetchDueAmount();
   }, []);

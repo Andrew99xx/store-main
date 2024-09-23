@@ -23,7 +23,6 @@ const EditProduct = () => {
             setUnit(productData.unit);
             setWeight(productData.weight);
         };
-
         fetchProduct();
     }, [productId]);
 
@@ -124,8 +123,6 @@ const EditProduct = () => {
                             Delete Product
                         </button>
                     </div>
-
-
                 </form>
 
                 <Link

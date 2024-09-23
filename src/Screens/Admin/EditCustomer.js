@@ -19,7 +19,6 @@ const EditCustomer = () => {
             setPhone(customerData.phone);
             setEmail(customerData.email);
         };
-
         fetchCustomer();
     }, [customerId]);
 
@@ -61,7 +60,6 @@ const EditCustomer = () => {
                             onChange={(e) => setName(e.target.value)} 
                         />
                     </div>
-
                     <div>
                         <label className="block text-gray-700 mb-1">Customer's Phone</label>
                         <input 
@@ -71,7 +69,6 @@ const EditCustomer = () => {
                             onChange={(e) => setPhone(e.target.value)} 
                         />
                     </div>
-
                     <div>
                         <label className="block text-gray-700 mb-1">Customer's Email</label>
                         <input 
@@ -81,7 +78,6 @@ const EditCustomer = () => {
                             onChange={(e) => setEmail(e.target.value)} 
                         />
                     </div>
-
                     <div className="flex space-x-4 mt-4">
                         <button 
                             onClick={handleUpdate} 
@@ -99,7 +95,6 @@ const EditCustomer = () => {
                         </button>
                     </div>
                 </form>
-
                 <Link 
                     to="/admin/customers" 
                     className="mt-6 inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-center w-full"

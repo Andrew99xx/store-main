@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    db, collection, addDoc, query, getDocs, where
+    db, collection, addDoc, query, getDocs, where, serverTimestamp, updateDoc
 } from '../../firebase';
 
 const AddCustomer = () => {
@@ -36,8 +36,21 @@ const AddCustomer = () => {
                 alert('This phone number already exists with other users.');
                 return;
             }
-            await addDoc(collection(db, 'customers'), { name, phone, email });
+
+            // Add customer document and capture the returned document reference
+            const docRef = await addDoc(collection(db, 'customers'), {
+                name,
+                phone,
+                email,
+                createdAt: serverTimestamp()
+            });
+
+            // Update the document with customerId field (which is the document ID)
+            await updateDoc(docRef, { customerId: docRef.id });
+
+            // empty the fields
             setCustomerData({ name: '', phone: '', email: '' });
+
             alert('Customer added successfully');
         } catch (error) {
             alert("Error adding customer: " + error.message);

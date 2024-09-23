@@ -50,9 +50,11 @@ const AddProduct = () => {
     e.preventDefault();
     try {
       let productUpdated = false;
+      let creditorIdToUse = selectedCreditorId;
 
       console.log("Existing products:", existingProducts);
 
+      // Update existing product logic
       for (let product of existingProducts) {
         alert(`Checking product: ${product.name} @ ${product.price}`);
         if (product.price === price && product.weight === weight && product.unit === unit) {
@@ -62,10 +64,8 @@ const AddProduct = () => {
             quantity: product.quantity + quantity,
             paid,
             paymentMode,
-            creditorId: paid ? null : selectedCreditorId,
+            creditorId: paid ? null : creditorIdToUse,
           });
-          // productUpdated , if already that product is in database
-          // breaking , no execution 
           productUpdated = true;
           break;
         }
@@ -75,18 +75,20 @@ const AddProduct = () => {
         alert("Adding creditor information");
 
         // Check if a creditor was selected from the dropdown
-        if (selectedCreditorId === "newCreditor" && creditorName.trim()) {
-          // Add a new creditor to creditors database
+        if (creditorIdToUse === "newCreditor" && creditorName.trim()) {
+          // Add a new creditor to the database
           const newCreditorRef = await addDoc(collection(db, "creditors"), {
             name: creditorName,
             createdAt: serverTimestamp(),
-            id: "" // Temporary placeholder, will be updated with the document ID
-
+            creditorId: ""
           });
-          
+          // Update the creditorId and state
+          creditorIdToUse = newCreditorRef.id;
+          await updateDoc(newCreditorRef, { creditorId: newCreditorRef.id });
+
+          // this process is aynchronous
           setSelectedCreditorId(newCreditorRef.id);
-          await updateDoc(newCreditorRef, { id: newCreditorRef.id });
-        } else {
+        } else if (!creditorIdToUse) {
           alert("Please select or add a creditor");
           return;
         }
@@ -94,6 +96,7 @@ const AddProduct = () => {
 
       if (!productUpdated) {
         alert("Adding new product");
+
         const productData = {
           name: productName,
           normalized_name: productName.toLowerCase().trim(),
@@ -102,17 +105,23 @@ const AddProduct = () => {
           weight: weight,
           unit: unit,
           paid,
-          paymentMode,
-          creditorId: paid ? null : selectedCreditorId,
+          
+          // paid = true, then add paymentMode
+          paymentMode: paid ? paymentMode : null,
+
+          // paid = false, then add creditor
+          creditorId: paid ? null : creditorIdToUse,
           createdAt: serverTimestamp(),
         };
 
-        await addDoc(collection(db, "products"), productData);
+        // Add the new product to the collection
+        const docRef = await addDoc(collection(db, "products"), productData);
+
+        // After the document is created, update it with the documentId
+        await updateDoc(docRef, { productId: docRef.id });
       }
 
-     
-
-      // empty input boxes after savings
+      // Reset form inputs
       setProductName("");
       setQuantity("");
       setPrice("");
@@ -124,11 +133,13 @@ const AddProduct = () => {
       setExistingProducts([]);
       setSelectedCreditorId("");
       alert("Product saved successfully!");
+
     } catch (error) {
       console.error("Error saving product:", error);
       alert("Error saving product");
     }
   };
+
 
 
   const itemWrapper = 'flex flex-col gap-2 w-full'

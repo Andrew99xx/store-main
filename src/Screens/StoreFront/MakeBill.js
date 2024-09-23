@@ -121,7 +121,7 @@ const MakeBill = () => {
       if (querySnapshot.empty) {
         const customerRef = await addDoc(collection(db, "customers"), {
           phone: customerPhone,
-          name: customerPhone, 
+          name: customerPhone,
           // Default name as phone number, can be updated later if needed
         });
         setCustomerId(customerRef.id);
@@ -245,7 +245,7 @@ const MakeBill = () => {
 
   const onSuggestionSelected = (event, { suggestion }) => {
     setCustomerId(suggestion.id);
-    setCustomerName(suggestion.phone); 
+    setCustomerName(suggestion.phone);
     // Update customer name with phone number for now
   };
 
@@ -253,28 +253,32 @@ const MakeBill = () => {
     placeholder: 'Customer Phone',
     value: customerPhone,
     onChange: onChange,
-    className: "inputfield"
+    className: "px-2 py-2 flex-1 w-full"
   };
 
   return (
     <div className=" mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Bill</h2>
 
-      <div className="flex items-center mb-4">
-        <Autosuggest
-          suggestions={customers}
-          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-          onSuggestionsClearRequested={onSuggestionsClearRequested}
-          getSuggestionValue={getSuggestionValue}
-          renderSuggestion={renderSuggestion}
-          inputProps={inputProps}
-          onSuggestionSelected={onSuggestionSelected}
-        />
+
+      <h3 className="text-lg font-semibold mb-2 text-gray-700">Enter Customer Phone Number</h3>
+      <div className="flex items-center justify-between mb-4 w-full gap-6">
+        <div className="flex-1 border">
+          <Autosuggest
+            suggestions={customers}
+            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={onSuggestionsClearRequested}
+            getSuggestionValue={getSuggestionValue}
+            renderSuggestion={renderSuggestion}
+            inputProps={inputProps}
+            onSuggestionSelected={onSuggestionSelected}
+          />
+        </div>
         <button
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={handleFindOrAddCustomer}
         >
-          Select customer
+          Confirm Phone 
         </button>
       </div>
 
@@ -379,9 +383,6 @@ const MakeBill = () => {
           </tbody>
         </table>
       </div>
-
-      
-
       <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
         <div className="mb-4">

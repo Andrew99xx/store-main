@@ -5,27 +5,35 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.react-autosuggest__suggestions-container .react-autosuggest__suggestion {
-  padding: 10px;
-  background-color: aliceblue;
-  border-bottom: 1px solid black;
-
+/* Specific styles for react-autosuggest */
+.react-autosuggest__suggestions-container {
+  width: 100%;
+  /* border: 1px solid #000;  */
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
 }
 
-.react-autosuggest__suggestions-container .react-autosuggest__suggestion:hover {
-  padding: 10px;
-  background-color: rgb(53, 94, 130);
-  cursor: pointer;
+.react-autosuggest__suggestions-container--open {
+  overflow-y: auto;  
+}
 
+.react-autosuggest__suggestion {
+  padding: 0.5rem; 
+  background-color: aliceblue; 
+  border: 1px solid black; 
+}
+
+.react-autosuggest__suggestion--highlighted {
+  background-color: aqua; 
+  color: black; 
+  cursor: pointer; 
 }
