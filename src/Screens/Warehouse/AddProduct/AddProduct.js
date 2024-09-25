@@ -19,13 +19,13 @@ const AddProduct = () => {
   const [selectedCreditorId, setSelectedCreditorId] = useState("");
 
   useEffect(() => {
-
     // where we are using this
     const fetchProducts = async () => {
       if (productName) {
         const normalizedProductName = productName.toLowerCase().trim();
         const q = query(collection(db, "products"), where("normalized_name", "==", normalizedProductName));
         const querySnapshot = await getDocs(q);
+        // type is array
         setExistingProducts(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       }
     };
@@ -52,34 +52,15 @@ const AddProduct = () => {
       let productUpdated = false;
       let creditorIdToUse = selectedCreditorId;
 
-      console.log("Existing products:", existingProducts);
-
-      // Update existing product logic
-      for (let product of existingProducts) {
-        alert(`Checking product: ${product.name} @ ${product.price}`);
-        if (product.price === price && product.weight === weight && product.unit === unit) {
-          const productRef = doc(db, "products", product.id);
-          console.log(`Updating product ID: ${product.id}`);
-          await updateDoc(productRef, {
-            quantity: product.quantity + quantity,
-            paid,
-            paymentMode,
-            creditorId: paid ? null : creditorIdToUse,
-          });
-          productUpdated = true;
-          break;
-        }
-      }
-
       if (!paid) {
         alert("Adding creditor information");
-
         // Check if a creditor was selected from the dropdown
         if (creditorIdToUse === "newCreditor" && creditorName.trim()) {
           // Add a new creditor to the database
           const newCreditorRef = await addDoc(collection(db, "creditors"), {
             name: creditorName,
             createdAt: serverTimestamp(),
+            updatedAt : serverTimestamp(),
             creditorId: ""
           });
           // Update the creditorId and state
@@ -94,9 +75,59 @@ const AddProduct = () => {
         }
       }
 
+      console.log("Existing products:", existingProducts);
+
+      // Update existing product logic
+      for (let product of existingProducts) {
+        alert(`Checking product: ${product.name} @ ${product.price}`);
+
+        // same product - deciding on basis on pirce, weight & unit (like  kg/litre/meter)
+        if (product.price === price && product.weight === weight && product.unit === unit) {
+         
+          alert(`Updating product ID: ${product.id}`);
+          const updatedProductData = {
+            updatedAt : serverTimestamp(),
+            quantity : product.quantity + quantity,
+            price : price,
+          }
+          // updating product 
+          const productRef = doc(db, "products", product.id);
+          await updateDoc(productRef, updatedProductData);
+
+
+          // maintaining history 
+          const newProductDataHistory = {
+            name: productName,
+            normalized_name: productName.toLowerCase().trim(),
+            quantity: quantity,
+            price: price,
+            weight: weight,
+            unit: unit,
+            paid,
+            // paid = true, then add paymentMode
+            paymentMode: paid ? paymentMode : null,
+            // paid = false, then add creditor
+            creditorId: paid ? null : creditorIdToUse,
+            productId : product.id,
+            createdAt: serverTimestamp(),
+            updatedAt : serverTimestamp(),
+          };
+
+          // we will never update this sub collection parts , never , this is our history record, 
+          const subCollectionName = `products/${productRef.id}/warehouse`;
+          const warehouseRef = await addDoc(collection(db, `${subCollectionName}`), newProductDataHistory);
+          await updateDoc(warehouseRef, { wareHouseId: warehouseRef.id })
+
+          // make true, so, same product didn't get added
+          productUpdated = true;
+          break;
+        }
+      }
+
       if (!productUpdated) {
         alert("Adding new product");
 
+        // just product data only 
         const productData = {
           name: productName,
           normalized_name: productName.toLowerCase().trim(),
@@ -104,21 +135,38 @@ const AddProduct = () => {
           price: price,
           weight: weight,
           unit: unit,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        };
+        // Add the new product to the collection
+        // this will be updating, if product matches , code in above 
+        // After the document is created, update it with the documentId
+        const productRef = await addDoc(collection(db, "products"), productData);
+        await updateDoc(productRef, { productId: productRef.id });
+
+
+        // maintaining product history on every added product
+        const productDataHistory = {
+          name: productName,
+          normalized_name: productName.toLowerCase().trim(),
+          quantity: quantity,
+          price: price,
+          weight: weight,
+          unit: unit,
           paid,
-          
           // paid = true, then add paymentMode
           paymentMode: paid ? paymentMode : null,
-
           // paid = false, then add creditor
           creditorId: paid ? null : creditorIdToUse,
+          productId : productRef.id,
           createdAt: serverTimestamp(),
+          updatedAt : serverTimestamp(),
         };
-
-        // Add the new product to the collection
-        const docRef = await addDoc(collection(db, "products"), productData);
-
-        // After the document is created, update it with the documentId
-        await updateDoc(docRef, { productId: docRef.id });
+        // Adding new subcollection 'warehouse' inside the newly created product
+        // we will never update this sub collection parts , never , this is our history record, 
+        const subCollectionName = `products/${productRef.id}/warehouse`;
+        const warehouseRef = await addDoc(collection(db, `${subCollectionName}`), productDataHistory);
+        await updateDoc(warehouseRef, { wareHouseId: warehouseRef.id })
       }
 
       // Reset form inputs
