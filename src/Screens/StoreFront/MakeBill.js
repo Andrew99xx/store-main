@@ -41,7 +41,8 @@ const MakeBill = () => {
         ...doc.data(),
       }));
       setProducts(productsData);
-      setFilteredProducts(productsData.slice(0, 5)); // Display only top 5 products initially
+      setFilteredProducts(productsData.slice(0, 5)); 
+      // Display only top 5 products initially
     };
 
     fetchProducts();
@@ -52,7 +53,8 @@ const MakeBill = () => {
     const filteredData = products.filter((item) =>
       item.name.toLowerCase().includes(lowercasedFilter)
     );
-    setFilteredProducts(filteredData.slice(0, 5)); // Limit search results to top 5
+    setFilteredProducts(filteredData.slice(0, 5)); 
+    // Limit search results to top 5
   }, [searchQuery, products]);
 
   useEffect(() => {
@@ -83,7 +85,8 @@ const MakeBill = () => {
             selectedQuantity: Math.max(
               0,
               Math.min(product.quantity, newQuantity)
-            ), // Ensure quantity does not go below 0 or above available stock
+            ),
+            // Ensure quantity does not go below 0 or above available stock
           };
         }
         return item;
@@ -98,6 +101,7 @@ const MakeBill = () => {
             0,
             Math.min(product.quantity, quantity)
           ), // Ensure quantity does not go below 0 or above available stock
+          // adding new field, selectedQuantity 
         },
       ]);
     }
@@ -122,6 +126,8 @@ const MakeBill = () => {
         const customerRef = await addDoc(collection(db, "customers"), {
           phone: customerPhone,
           name: customerPhone,
+          createdAt : serverTimestamp(),
+          updatedAt : serverTimestamp(),
           // Default name as phone number, can be updated later if needed
         });
         setCustomerId(customerRef.id);
