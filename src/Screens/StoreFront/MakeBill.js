@@ -41,7 +41,8 @@ const MakeBill = () => {
         ...doc.data(),
       }));
       setProducts(productsData);
-      setFilteredProducts(productsData.slice(0, 5)); // Display only top 5 products initially
+      setFilteredProducts(productsData.slice(0, 5));
+      // Display only top 5 products initially
     };
 
     fetchProducts();
@@ -52,7 +53,8 @@ const MakeBill = () => {
     const filteredData = products.filter((item) =>
       item.name.toLowerCase().includes(lowercasedFilter)
     );
-    setFilteredProducts(filteredData.slice(0, 5)); // Limit search results to top 5
+    setFilteredProducts(filteredData.slice(0, 5));
+    // Limit search results to top 5
   }, [searchQuery, products]);
 
   useEffect(() => {
@@ -83,7 +85,8 @@ const MakeBill = () => {
             selectedQuantity: Math.max(
               0,
               Math.min(product.quantity, newQuantity)
-            ), // Ensure quantity does not go below 0 or above available stock
+            ),
+            // Ensure quantity does not go below 0 or above available stock
           };
         }
         return item;
@@ -98,6 +101,7 @@ const MakeBill = () => {
             0,
             Math.min(product.quantity, quantity)
           ), // Ensure quantity does not go below 0 or above available stock
+          // adding new field, selectedQuantity 
         },
       ]);
     }
@@ -121,7 +125,10 @@ const MakeBill = () => {
       if (querySnapshot.empty) {
         const customerRef = await addDoc(collection(db, "customers"), {
           phone: customerPhone,
-          name: customerPhone, // Default name as phone number, can be updated later if needed
+          name: customerPhone,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          // Default name as phone number, can be updated later if needed
         });
         setCustomerId(customerRef.id);
         setCustomerName(customerPhone);
@@ -178,8 +185,38 @@ const MakeBill = () => {
       for (let product of selectedProducts) {
         const productRef = doc(db, "products", product.id);
         await updateDoc(productRef, {
+          // updating stock quantity 
           quantity: product.quantity - product.selectedQuantity,
+          updatedAt: serverTimestamp(),
+          remarks: "product sold, updating product quantity"
         });
+
+        // also maintain history , do review before modifying code 
+        // maintaining product history on every sold product
+        const productDataHistory = {
+          name: product.name,
+          normalized_name: product.normalized_name,
+          // quantity sold is main things to maintain 
+          quantity: product.selectedQuantity,
+          // in differen places quantity may be referring different meanings 
+          // quantity can be - total quantity of product left - in our stock
+          // quantity can be - total quantity of product sold - from storefront - to customer 
+          // quantity can be - total quantity of product added - from warehouse - from creditor
+          price: product.price,
+          weight: product.weight,
+          unit: product.unit,
+          // paid : product.paid,
+          customerId: customerId,
+          productId: product.id,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        };
+        // Adding new subcollection 'storefront' inside the  product
+        // we will never update this sub collection parts , never , this is our history record,
+        // how many times, same products sold, maintain quantity sold 
+        const subCollectionName = `products/${productRef.id}/storefront`;
+        const storefrontRef = await addDoc(collection(db, `${subCollectionName}`), productDataHistory);
+        await updateDoc(storefrontRef, { storefrontId: storefrontRef.id })
       }
 
       alert("Bill completed successfully");
@@ -244,80 +281,103 @@ const MakeBill = () => {
 
   const onSuggestionSelected = (event, { suggestion }) => {
     setCustomerId(suggestion.id);
-    setCustomerName(suggestion.phone); // Update customer name with phone number for now
+    setCustomerName(suggestion.phone);
+    // Update customer name with phone number for now
   };
 
   const inputProps = {
     placeholder: 'Customer Phone',
     value: customerPhone,
     onChange: onChange,
-    className: "inputfield"
+    className: "px-2 py-2 flex-1 w-full"
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
+    <div className=" mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Bill</h2>
 
-      <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-700">Select Products</h3>
-        <input
-          type="text"
-          placeholder="Search Products"
-          value={searchQuery}
-          className=" border rounded px-3 py-2 w-full mb-4 text-gray-700"
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <h4 className="text-md font-medium mb-2 text-gray-600">Top picks</h4>
-        <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700">
-              <th className="px-4 py-2 text-left">ID</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Weight</th>
-              <th className="px-4 py-2 text-left">Price</th>
-              <th className="px-4 py-2 text-left">Quantity Available</th>
-              <th className="px-4 py-2 text-left">Select Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map((product) => (
-              <tr key={product.id} className="border-t">
-                <td className="px-4 py-2">{product.id}</td>
-                <td className="px-4 py-2">{product.name}</td>
-                <td className="px-4 py-2">{product.weight + product.unit}</td>
-                <td className="px-4 py-2">₹{product.price}</td>
-                <td className="px-4 py-2">{product.quantity}</td>
-                <td className="px-4 py-2 flex items-center">
-                  <button
-                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                    onClick={() => handleAddProduct(product, -1)}
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    max={product.quantity}
-                    placeholder="Quantity"
-                    value={
-                      selectedProducts.find((p) => p.id === product.id)
-                        ?.selectedQuantity || 0
-                    }
-                    onChange={(e) => handleInputChange(product, e)}
-                    className="border w-16 mx-2 px-2 py-1 text-center rounded"
-                  />
-                  <button
-                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                    onClick={() => handleAddProduct(product, 1)}
-                  >
-                    +
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <h3 className="text-lg font-semibold mb-2 text-gray-700">Enter Customer Phone Number</h3>
+      <div className="flex items-center justify-between mb-4 w-full gap-6">
+        <div className="flex-1 border">
+          <Autosuggest
+            suggestions={customers}
+            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={onSuggestionsClearRequested}
+            getSuggestionValue={getSuggestionValue}
+            renderSuggestion={renderSuggestion}
+            inputProps={inputProps}
+            onSuggestionSelected={onSuggestionSelected}
+          />
+        </div>
+        <button
+          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={handleFindOrAddCustomer}
+        >
+          Confirm Phone
+        </button>
       </div>
+
+      <h3 className="text-lg font-semibold mb-2 text-gray-700">Select Products</h3>
+      <input
+        type="text"
+        placeholder="Search Products"
+        value={searchQuery}
+        className=" border rounded px-3 py-2 w-full mb-4 text-gray-700"
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      <h4 className="text-md font-medium mb-2 text-gray-600">Top Products</h4>
+      <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
+        <thead>
+          <tr className="bg-gray-200 text-gray-700">
+            <th className="px-4 py-2 text-left">ID</th>
+            <th className="px-4 py-2 text-left">Name</th>
+            <th className="px-4 py-2 text-left">Weight</th>
+            <th className="px-4 py-2 text-left">Price</th>
+            <th className="px-4 py-2 text-left">Quantity Available</th>
+            <th className="px-4 py-2 text-left">Select Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredProducts.map((product) => (
+            <tr key={product.id} className="border-t">
+              <td className="px-4 py-2">{product.id}</td>
+              <td className="px-4 py-2">{product.name}</td>
+              <td className="px-4 py-2">{product.weight + product.unit}</td>
+              <td className="px-4 py-2">₹{product.price}</td>
+              <td className="px-4 py-2">{product.quantity}</td>
+              <td className="px-4 py-2 flex items-center">
+                <button
+                  className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                  onClick={() => handleAddProduct(product, -1)}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min="0"
+                  max={product.quantity}
+                  placeholder="Quantity"
+                  value={
+                    selectedProducts.find((p) => p.id === product.id)
+                      ?.selectedQuantity || 0
+                  }
+                  onChange={(e) => handleInputChange(product, e)}
+                  className="border w-16 mx-2 px-2 py-1 text-center rounded"
+                />
+                <button
+                  className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                  onClick={() => handleAddProduct(product, 1)}
+                >
+                  +
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
 
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-700 mb-2">Selected Products</h3>
@@ -359,27 +419,6 @@ const MakeBill = () => {
           </tbody>
         </table>
       </div>
-
-      <hr className="my-8 border-gray-300" />
-
-      <div className="flex items-center mb-4">
-        <Autosuggest
-          suggestions={customers}
-          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-          onSuggestionsClearRequested={onSuggestionsClearRequested}
-          getSuggestionValue={getSuggestionValue}
-          renderSuggestion={renderSuggestion}
-          inputProps={inputProps}
-          onSuggestionSelected={onSuggestionSelected}
-        />
-        <button
-          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleFindOrAddCustomer}
-        >
-          Select customer
-        </button>
-      </div>
-
       <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
         <div className="mb-4">
@@ -408,6 +447,7 @@ const MakeBill = () => {
         </div>
 
         <button
+          type="button"
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           onClick={handleCompleteBill}
         >
