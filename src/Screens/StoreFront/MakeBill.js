@@ -41,7 +41,7 @@ const MakeBill = () => {
         ...doc.data(),
       }));
       setProducts(productsData);
-      setFilteredProducts(productsData.slice(0, 5)); 
+      setFilteredProducts(productsData.slice(0, 5));
       // Display only top 5 products initially
     };
 
@@ -53,7 +53,7 @@ const MakeBill = () => {
     const filteredData = products.filter((item) =>
       item.name.toLowerCase().includes(lowercasedFilter)
     );
-    setFilteredProducts(filteredData.slice(0, 5)); 
+    setFilteredProducts(filteredData.slice(0, 5));
     // Limit search results to top 5
   }, [searchQuery, products]);
 
@@ -126,8 +126,8 @@ const MakeBill = () => {
         const customerRef = await addDoc(collection(db, "customers"), {
           phone: customerPhone,
           name: customerPhone,
-          createdAt : serverTimestamp(),
-          updatedAt : serverTimestamp(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
           // Default name as phone number, can be updated later if needed
         });
         setCustomerId(customerRef.id);
@@ -185,8 +185,38 @@ const MakeBill = () => {
       for (let product of selectedProducts) {
         const productRef = doc(db, "products", product.id);
         await updateDoc(productRef, {
+          // updating stock quantity 
           quantity: product.quantity - product.selectedQuantity,
+          updatedAt: serverTimestamp(),
+          remarks: "product sold, updating product quantity"
         });
+
+        // also maintain history , do review before modifying code 
+        // maintaining product history on every sold product
+        const productDataHistory = {
+          name: product.name,
+          normalized_name: product.normalized_name,
+          // quantity sold is main things to maintain 
+          quantity: product.selectedQuantity,
+          // in differen places quantity may be referring different meanings 
+          // quantity can be - total quantity of product left - in our stock
+          // quantity can be - total quantity of product sold - from storefront - to customer 
+          // quantity can be - total quantity of product added - from warehouse - from creditor
+          price: product.price,
+          weight: product.weight,
+          unit: product.unit,
+          // paid : product.paid,
+          customerId: customerId,
+          productId: product.id,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        };
+        // Adding new subcollection 'storefront' inside the  product
+        // we will never update this sub collection parts , never , this is our history record,
+        // how many times, same products sold, maintain quantity sold 
+        const subCollectionName = `products/${productRef.id}/storefront`;
+        const storefrontRef = await addDoc(collection(db, `${subCollectionName}`), productDataHistory);
+        await updateDoc(storefrontRef, { storefrontId: storefrontRef.id })
       }
 
       alert("Bill completed successfully");
@@ -284,7 +314,7 @@ const MakeBill = () => {
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={handleFindOrAddCustomer}
         >
-          Confirm Phone 
+          Confirm Phone
         </button>
       </div>
 
