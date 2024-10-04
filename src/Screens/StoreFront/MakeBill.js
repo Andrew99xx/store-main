@@ -229,14 +229,17 @@ const MakeBill = () => {
 
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
-    setAmountPaid(finalAmount);
+    setAmountPaid(finalAmount); // i think this line is not correct here
+    // why 
     // Set amount paid to final amount if paying by cash or UPI
   };
 
   const handlePaymentStatusChange = (status) => {
     setPaymentStatus(status);
     if (status === "due") {
-      setAmountPaid(0);
+      // setAmountPaid(0)
+      setAmountPaid(amountPaid);
+      setDueAmount(finalAmount - amountPaid);
     } else {
       setAmountPaid(finalAmount);
     }
@@ -329,61 +332,63 @@ const MakeBill = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      <h4 className="text-md font-medium mb-2 text-gray-600">Top Products</h4>
-      <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
-        <thead>
-          <tr className="bg-gray-200 text-gray-700">
-            <th className="px-4 py-2 text-left">ID</th>
-            <th className="px-4 py-2 text-left">Name</th>
-            <th className="px-4 py-2 text-left">Weight</th>
-            <th className="px-4 py-2 text-left">Price</th>
-            <th className="px-4 py-2 text-left">Quantity Available</th>
-            <th className="px-4 py-2 text-left">Select Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProducts.map((product) => (
-            <tr key={product.id} className="border-t">
-              <td className="px-4 py-2">{product.id}</td>
-              <td className="px-4 py-2">{product.name}</td>
-              <td className="px-4 py-2">{product.weight + product.unit}</td>
-              <td className="px-4 py-2">₹{product.price}</td>
-              <td className="px-4 py-2">{product.quantity}</td>
-              <td className="px-4 py-2 flex items-center">
-                <button
-                  className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                  onClick={() => handleAddProduct(product, -1)}
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min="0"
-                  max={product.quantity}
-                  placeholder="Quantity"
-                  value={
-                    selectedProducts.find((p) => p.id === product.id)
-                      ?.selectedQuantity || 0
-                  }
-                  onChange={(e) => handleInputChange(product, e)}
-                  className="border w-16 mx-2 px-2 py-1 text-center rounded"
-                />
-                <button
-                  className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                  onClick={() => handleAddProduct(product, 1)}
-                >
-                  +
-                </button>
-              </td>
+      <div className="mt-2 overflow-auto">
+        <h4 className="text-md font-medium mb-2 text-gray-600">Top Products</h4>
+        <table className="min-w-full table-auto bg-white shadow-md rounded">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Weight</th>
+              <th className="px-4 py-2 text-left">Price</th>
+              <th className="px-4 py-2 text-left">Quantity Available</th>
+              <th className="px-4 py-2 text-left">Select Quantity</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredProducts.map((product) => (
+              <tr key={product.id} className="border-t">
+                <td className="px-4 py-2">{product.id}</td>
+                <td className="px-4 py-2">{product.name}</td>
+                <td className="px-4 py-2">{product.weight + product.unit}</td>
+                <td className="px-4 py-2">₹{product.price}</td>
+                <td className="px-4 py-2">{product.quantity}</td>
+                <td className="px-4 py-2 flex items-center">
+                  <button
+                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                    onClick={() => handleAddProduct(product, -1)}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    max={product.quantity}
+                    placeholder="Quantity"
+                    value={
+                      selectedProducts.find((p) => p.id === product.id)
+                        ?.selectedQuantity || 0
+                    }
+                    onChange={(e) => handleInputChange(product, e)}
+                    className="border w-16 mx-2 px-2 py-1 text-center rounded"
+                  />
+                  <button
+                    className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                    onClick={() => handleAddProduct(product, 1)}
+                  >
+                    +
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
 
-      <div className="mt-6">
+      <div className="mt-6 overflow-auto">
         <h3 className="text-lg font-semibold text-gray-700 mb-2">Selected Products</h3>
-        <table className="min-w-full table-auto bg-white shadow-md rounded overflow-hidden">
+        <table className="min-w-full table-auto bg-white shadow-md rounded">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               <th className="px-4 py-2 text-left">ID</th>
@@ -420,9 +425,10 @@ const MakeBill = () => {
             ))}
           </tbody>
         </table>
-        <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
-          <h3 className="text-xl font-semibold text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
-        </div>
+      </div>
+
+      <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
+        <h3 className="text-xl font-semibold text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
       </div>
 
       {/* GST Toggle and Input */}
@@ -465,20 +471,37 @@ const MakeBill = () => {
       </div>
 
       <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
+        <h3 className="text-xl font-semibold text-gray-700">Final Amount (with GST): ₹{finalAmount.toFixed(2)}</h3>
+      </div>
+
+      <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
         <label className="block text-gray-700 font-medium mb-2">
           Payment Method:
         </label>
         <select
           value={paymentMethod}
-          // onChange={handlePaymentChange}
+          onChange={(e) => handlePaymentMethodChange(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
         >
-          <option value="">Select Payment Method</option>
+          <option value="" disabled>Select Payment Method</option>
           <option value="cash">Cash</option>
           <option value="upi_card">UPI/Card</option>
         </select>
-        <div className="mb-4">
+
+        {paymentMethod && ( 
+          // Add input for amount paid when payment method is selected
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">Amount Paid:</label>
+            <input
+              type="number"
+              value={amountPaid}
+              onChange={(e) => setAmountPaid(Number(e.target.value))} // Handle amount paid input
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            />
+          </div>
+        )}
+        <div className="ml-1">
+          <h3 className="block text-gray-700 font-medium mb-2">Payment Status:</h3>
           <label className="mr-4">
             <input
               type="radio"
@@ -488,7 +511,7 @@ const MakeBill = () => {
               onChange={() => handlePaymentStatusChange("paid")}
               className="mr-2"
             />
-            Paid
+            Fully Paid
           </label>
           <label>
             <input
@@ -506,9 +529,7 @@ const MakeBill = () => {
 
       {/* Payment Details */}
       <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-4">
-       
-
-        <div className="mt-4">
+        <div className="mt-2">
           <h4 className="text-gray-700 font-medium">
             Amount Paid: <span className="font-semibold">₹{amountPaid}</span>
           </h4>
@@ -522,12 +543,12 @@ const MakeBill = () => {
       </div>
 
       <button
-          type="button"
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          onClick={handleCompleteBill}
-        >
-          Complete Bill
-        </button>
+        type="button"
+        className="my-6 mx-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        onClick={handleCompleteBill}
+      >
+        Complete Bill
+      </button>
     </div>
   );
 };
