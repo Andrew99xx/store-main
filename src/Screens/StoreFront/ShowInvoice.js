@@ -90,7 +90,12 @@ const ShowInvoice = ({ invoice: propInvoice }) => {
                         <p><strong className="font-semibold">GST Amount:</strong> ₹{safeToFixed(invoice.gstAmount)}</p>
                     </>
                 )}
-                <h3 className="text-xl font-semibold mt-6">Final Amount (including GST): ₹{safeToFixed(invoice.finalAmount)}</h3>
+
+                <div className='bg-gray-200 my-4 flex flex-col gap-2 py-3 px-2 border '>
+                    <h3 className="text-xl font-semibold ">Final Amount (including GST): ₹{safeToFixed(invoice.finalAmount)}</h3>
+                    <h3 className="text-xl font-semibold">Paid Amount: ₹{safeToFixed(invoice.amountPaid)}</h3>
+                    <h3 className="text-xl font-semibold">Final Amount (including GST): ₹{safeToFixed(invoice.dueAmount)}</h3>
+                </div>
                 <p><strong className="font-semibold">Date:</strong> {formatDate(invoice.createdAt)}</p>
             </div>
             <div className="mt-6 text-center">

@@ -72,6 +72,19 @@ const MakeBill = () => {
     setFinalAmount(totalAmount + gst);
   }, [totalAmount, isGstApplied]);
 
+  // uddate due amount, whenever amount paid change
+  useEffect(() => {
+    setDueAmount(finalAmount - amountPaid);
+    if (amountPaid === 0) {
+      setPaymentStatus("due");
+    }
+    else {
+      if (amountPaid.toFixed(2) === finalAmount.toFixed(2)) {
+        setPaymentStatus("paid");
+      }
+    }
+  }, [amountPaid, finalAmount])
+
   const handleAddProduct = (product, quantity) => {
     const existingProduct = selectedProducts.find(
       (item) => item.id === product.id
@@ -146,6 +159,8 @@ const MakeBill = () => {
     try {
       if (paymentStatus === "paid" && amountPaid < finalAmount) {
         // how this is working 
+        // if paymenStatus === paid, then it means full paid
+        // half payment, or no payment, will fall in due
         alert("Amount paid cannot be less than the total invoice amount");
         return;
       }
@@ -168,10 +183,13 @@ const MakeBill = () => {
         gstAmount,
         finalAmount,
         amountPaid,
-        paymentMethod: paymentStatus === "paid" ? paymentMethod : "",
+        paymentMethod,
+        // paymentMethod: paymentStatus === "paid" ? paymentMethod : "",
         paymentStatus,
-        dueAmount: paymentStatus === "due" ? finalAmount - amountPaid : 0,
-        paymentAmounts: paymentStatus === "paid" ? paymentData : {},
+        // dueAmount: paymentStatus === "due" ? finalAmount - amountPaid : 0,
+        dueAmount,
+        paymentAmounts: paymentData,
+        // paymentAmounts: paymentStatus === "paid" ? paymentData : {},
         createdAt: new Date(),
         isGstApplied,
         gstNumber,
@@ -237,9 +255,7 @@ const MakeBill = () => {
   const handlePaymentStatusChange = (status) => {
     setPaymentStatus(status);
     if (status === "due") {
-      // setAmountPaid(0)
-      setAmountPaid(amountPaid);
-      setDueAmount(finalAmount - amountPaid);
+      setAmountPaid(0)
     } else {
       setAmountPaid(finalAmount);
     }
@@ -462,10 +478,10 @@ const MakeBill = () => {
 
         <div className="mt-4">
           <h4 className="text-gray-700 font-medium">
-            GST Amount: <span className="font-semibold">₹{gstAmount}</span>
+            GST Amount: <span className="font-semibold">₹{gstAmount.toFixed(2)}</span>
           </h4>
           <h4 className="text-gray-700 font-medium mt-2">
-            Final Amount (with GST): <span className="font-semibold">₹{finalAmount}</span>
+            Final Amount (with GST): <span className="font-semibold">₹{finalAmount.toFixed(2)}</span>
           </h4>
         </div>
       </div>
@@ -483,24 +499,12 @@ const MakeBill = () => {
           onChange={(e) => handlePaymentMethodChange(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
         >
-          <option value="" disabled>Select Payment Method</option>
+          <option value="">Select Payment Method</option>
           <option value="cash">Cash</option>
           <option value="upi_card">UPI/Card</option>
         </select>
 
-        {paymentMethod && ( 
-          // Add input for amount paid when payment method is selected
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Amount Paid:</label>
-            <input
-              type="number"
-              value={amountPaid}
-              onChange={(e) => setAmountPaid(Number(e.target.value))} // Handle amount paid input
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
-          </div>
-        )}
-        <div className="ml-1">
+        <div className="ml-1 mb-4">
           <h3 className="block text-gray-700 font-medium mb-2">Payment Status:</h3>
           <label className="mr-4">
             <input
@@ -525,6 +529,21 @@ const MakeBill = () => {
             Due
           </label>
         </div>
+
+        {
+          paymentStatus === "due" ? <div>
+            <label className="block text-gray-700 font-medium mb-2">Any Amount Paid:</label>
+            <input
+              type="number"
+              value={amountPaid}
+              max={finalAmount}
+              min={0}
+              onChange={(e) => setAmountPaid(Number(e.target.value))} // Handle amount paid input
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            />
+          </div> : <></>
+        }
+
       </div>
 
       {/* Payment Details */}
