@@ -124,11 +124,11 @@ const MakeBill = () => {
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) {
         const customerRef = await addDoc(collection(db, "customers"), {
+          // Default name as phone number, can be updated later if needed
           phone: customerPhone,
           name: customerPhone,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          // Default name as phone number, can be updated later if needed
         });
         setCustomerId(customerRef.id);
         setCustomerName(customerPhone);
@@ -145,6 +145,7 @@ const MakeBill = () => {
   const handleCompleteBill = async () => {
     try {
       if (paymentStatus === "paid" && amountPaid < finalAmount) {
+        // how this is working 
         alert("Amount paid cannot be less than the total invoice amount");
         return;
       }
@@ -228,7 +229,8 @@ const MakeBill = () => {
 
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
-    setAmountPaid(finalAmount); // Set amount paid to final amount if paying by cash or UPI
+    setAmountPaid(finalAmount);
+    // Set amount paid to final amount if paying by cash or UPI
   };
 
   const handlePaymentStatusChange = (status) => {
@@ -314,7 +316,7 @@ const MakeBill = () => {
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={handleFindOrAddCustomer}
         >
-          Confirm Phone
+          Complete Selected Customer
         </button>
       </div>
 
@@ -418,9 +420,64 @@ const MakeBill = () => {
             ))}
           </tbody>
         </table>
+        <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
+          <h3 className="text-xl font-semibold text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
+        </div>
       </div>
+
+      {/* GST Toggle and Input */}
+      <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-4">
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            checked={isGstApplied}
+            onChange={(e) => setIsGstApplied(e.target.checked)}
+          />
+          <label className="text-gray-700 font-medium">
+            Apply GST (12%)
+          </label>
+        </div>
+
+        {isGstApplied && (
+          <div className="mt-3">
+            <label className="block text-gray-600 mb-1 font-medium">
+              GST Number:
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={gstNumber}
+              onChange={(e) => setGstNumber(e.target.value)}
+              placeholder="Enter GST number"
+            />
+          </div>
+        )}
+
+        <div className="mt-4">
+          <h4 className="text-gray-700 font-medium">
+            GST Amount: <span className="font-semibold">₹{gstAmount}</span>
+          </h4>
+          <h4 className="text-gray-700 font-medium mt-2">
+            Final Amount (with GST): <span className="font-semibold">₹{finalAmount}</span>
+          </h4>
+        </div>
+      </div>
+
       <div className="bg-gray-100 p-4 rounded shadow-md mt-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-700">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
+        <label className="block text-gray-700 font-medium mb-2">
+          Payment Method:
+        </label>
+        <select
+          value={paymentMethod}
+          // onChange={handlePaymentChange}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        >
+          <option value="">Select Payment Method</option>
+          <option value="cash">Cash</option>
+          <option value="upi_card">UPI/Card</option>
+        </select>
         <div className="mb-4">
           <label className="mr-4">
             <input
@@ -445,15 +502,32 @@ const MakeBill = () => {
             Due
           </label>
         </div>
+      </div>
 
-        <button
+      {/* Payment Details */}
+      <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-4">
+       
+
+        <div className="mt-4">
+          <h4 className="text-gray-700 font-medium">
+            Amount Paid: <span className="font-semibold">₹{amountPaid}</span>
+          </h4>
+          <h4 className="text-gray-700 font-medium mt-2">
+            Payment Status: <span className="font-semibold">{paymentStatus}</span>
+          </h4>
+          <h4 className="text-gray-700 font-medium mt-2">
+            Due Amount: <span className="font-semibold">₹{dueAmount}</span>
+          </h4>
+        </div>
+      </div>
+
+      <button
           type="button"
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           onClick={handleCompleteBill}
         >
           Complete Bill
         </button>
-      </div>
     </div>
   );
 };
