@@ -5,7 +5,24 @@ import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSu
 const units = ["kg", "gram", "liter", "milliliter"];
 const paymentModes = ["online", "cash"];
 
+const parentUnits = ["kg", "gram", "liter", "milliliter", "container", "sack", "box", "pieces", "can", "sache"];
+const unitHierarchy = {
+  container: ["kg", "gram", "liter", "milliliter", "sack", "box", "pieces", "can", "sache"],
+  box: ["pieces", "can", "sache", "liter", "milliliter", "kg", "gram"],
+  sack: ["pieces", "sache", "liter", "mililiter", "kg", "gram"],
+  can: [],
+  pieces: [],
+  sache: [],
+  kg: [],
+  gram: [],
+  liter: [],
+  milliliter: []
+};
+
 const AddProduct = () => {
+  const [primaryUnit, setPrimaryUnit] = useState("");
+  const [selectedUnits, setSelectedUnits] = useState({});
+
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
@@ -17,6 +34,15 @@ const AddProduct = () => {
   const [existingProducts, setExistingProducts] = useState([]);
   const [creditors, setCreditors] = useState([]);
   const [selectedCreditorId, setSelectedCreditorId] = useState("");
+
+  const handleSelect = (unit, parent) => {
+    setSelectedUnits((prevSelectedUnits) => ({
+      ...prevSelectedUnits,
+      [parent]: unit,
+    }));
+  };
+
+
 
   useEffect(() => {
     // where we are using this
@@ -60,7 +86,7 @@ const AddProduct = () => {
           const newCreditorRef = await addDoc(collection(db, "creditors"), {
             name: creditorName,
             createdAt: serverTimestamp(),
-            updatedAt : serverTimestamp(),
+            updatedAt: serverTimestamp(),
             creditorId: ""
           });
           // Update the creditorId and state
@@ -83,12 +109,12 @@ const AddProduct = () => {
 
         // same product - deciding on basis on pirce, weight & unit (like  kg/litre/meter)
         if (product.price === price && product.weight === weight && product.unit === unit) {
-         
+
           alert(`Updating product ID: ${product.id}`);
           const updatedProductData = {
-            updatedAt : serverTimestamp(),
-            quantity : product.quantity + quantity,
-            price : price,
+            updatedAt: serverTimestamp(),
+            quantity: product.quantity + quantity,
+            price: price,
           }
           // updating product 
           const productRef = doc(db, "products", product.id);
@@ -108,9 +134,9 @@ const AddProduct = () => {
             paymentMode: paid ? paymentMode : null,
             // paid = false, then add creditor
             creditorId: paid ? null : creditorIdToUse,
-            productId : product.id,
+            productId: product.id,
             createdAt: serverTimestamp(),
-            updatedAt : serverTimestamp(),
+            updatedAt: serverTimestamp(),
           };
 
           // we will never update this sub collection parts , never , this is our history record, 
@@ -158,9 +184,9 @@ const AddProduct = () => {
           paymentMode: paid ? paymentMode : null,
           // paid = false, then add creditor
           creditorId: paid ? null : creditorIdToUse,
-          productId : productRef.id,
+          productId: productRef.id,
           createdAt: serverTimestamp(),
-          updatedAt : serverTimestamp(),
+          updatedAt: serverTimestamp(),
         };
         // Adding new subcollection 'warehouse' inside the newly created product
         // we will never update this sub collection parts , never , this is our history record, 
@@ -188,6 +214,34 @@ const AddProduct = () => {
     }
   };
 
+
+
+  const renderDropdown = (parent) => {
+    const availableUnits = unitHierarchy[parent] || [];
+    if (availableUnits.length === 0) return null;
+
+    return (
+      <div className="mt-2">
+        <label className="block text-gray-700">{`Select sub-unit for ${parent}`}</label>
+        <select
+          className="block w-full p-2 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          value={selectedUnits[parent] || ""}
+          onChange={(e) => handleSelect(e.target.value, parent)}
+        >
+
+          <option value="" disabled>
+            Select a unit
+          </option>
+          {availableUnits.map((unit) => (
+            <option key={unit} value={unit}>
+              {unit}
+            </option>
+          ))}
+        </select>
+        {selectedUnits[parent] && renderDropdown(selectedUnits[parent])}
+      </div>
+    );
+  };
 
 
   const itemWrapper = 'flex flex-col gap-2 w-full'
@@ -231,7 +285,7 @@ const AddProduct = () => {
             )}
           </div>
           <div className={itemWrapper}>
-            <p className={itemName}>Quantity:</p>
+            <p className={itemName}>Quantity/number of primaryUnit</p>
             <input
               type="number"
               value={quantity}
@@ -242,7 +296,7 @@ const AddProduct = () => {
             />
           </div>
           <div className={itemWrapper}>
-            <p className={itemName}>Price:</p>
+            <p className={itemName}>Price of 1 primaryUnit :</p>
             <input
               type="number"
               value={price}
@@ -252,6 +306,45 @@ const AddProduct = () => {
               placeholder="Enter Price"
             />
           </div>
+
+          {/* <div>
+            <p>Select Primary Unit</p>
+            <select
+              value={primaryUnit}
+              onChange={(e) => setPrimaryUnit(e.target.value)}
+              className="border border-gray-950 h-12 px-2 py-2 rounded-md"
+              required
+            >
+              <option value="" disabled>Select Unit</option>
+              {parentUnits.map((unitOption) => (
+                <option key={unitOption} value={unitOption}>{unitOption}</option>
+              ))}
+            </select>
+          </div> */}
+
+          <div className="">
+            <h2 className="text-lg font-bold">Unit Selection</h2>
+            <div className="mt-4">
+              <label className="block text-gray-700">Select a Parent Unit</label>
+              <select
+                className="block w-full p-2 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                value={selectedUnits["parent"] || ""}
+                onChange={(e) => handleSelect(e.target.value, "parent")}
+              >
+                <option value="" disabled>
+                  Select a unit
+                </option>
+                {parentUnits.map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
+              </select>
+              {selectedUnits["parent"] && renderDropdown(selectedUnits["parent"])}
+            </div>
+          </div>
+
+
           <div className={itemWrapper}>
             <p className={itemName}>Weight:</p>
 
