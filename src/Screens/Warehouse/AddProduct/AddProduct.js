@@ -227,15 +227,20 @@ const AddProduct = () => {
 
 
 
+  const itemWrapper = 'flex flex-col gap-2 w-full'
+  const itemName = 'text-xl '
+  const itemInputField = 'border border-gray-950 h-12 px-2 py-2 w-full rounded-md'
+
+
   const renderDropdown = (parent) => {
     const availableUnits = unitHierarchy[parent] || [];
     if (availableUnits.length === 0) return null;
 
     return (
-      <div className="mt-2">
-        <label className="block text-gray-700">{`Select sub-unit for ${parent}`}</label>
+      <div className={itemWrapper}>
+        <label className={itemName}>{`Select sub-unit for ${parent}`}</label>
         <select
-          className="block w-full p-2 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          className={itemInputField}
           value={selectedUnits[parent] || ""}
           onChange={(e) => handleSelect(e.target.value, parent)}
         >
@@ -300,10 +305,6 @@ const AddProduct = () => {
 
 
 
-  const itemWrapper = 'flex flex-col gap-2 w-full'
-  const itemName = 'text-xl '
-  const itemInputField = 'border border-gray-950 h-12 px-2 py-2 w-full rounded-md'
-
 
   return (
     <div className=" w-full flex justify-center items-center">
@@ -313,6 +314,8 @@ const AddProduct = () => {
           onSubmit={handleSubmit}
           className="w-full px-4 py-6 bg-white flex flex-col gap-8"
         >
+
+
           <div className={itemWrapper}>
             <p className={itemName}>Product Name:</p>
             <input
@@ -358,12 +361,12 @@ const AddProduct = () => {
             </select>
           </div> */}
 
-          <div className="">
+          <div>
             <h2 className="text-lg font-bold">Unit Selection</h2>
-            <div className="mt-4">
-              <label className="block text-gray-700">Select a Parent Unit</label>
+            <div className={itemWrapper}>
+              <label className={itemName}>Select a Parent Unit</label>
               <select
-                className="block w-full p-2 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className={itemInputField}
                 value={selectedUnits["parent"] || ""}
                 onChange={(e) => handleSelect(e.target.value, "parent")}
               >
@@ -384,6 +387,7 @@ const AddProduct = () => {
 
 
 
+
           <div>
             {Object.entries(selectedUnits).map(([parent, unit]) => (
               <div key={parent}>
@@ -396,7 +400,7 @@ const AddProduct = () => {
           {
             selectedUnits["parent"] && (
               <div className={itemWrapper}>
-                <p className={itemName}>Price of 1 {selectedUnits["parent"]} :</p>
+                <p className={itemName}>Price of - 1 {selectedUnits["parent"]} :</p>
                 <input
                   type="number"
                   value={price}
@@ -410,9 +414,9 @@ const AddProduct = () => {
           }
 
           {
-            selectedUnits["parent"] && productName && (
+            selectedUnits["parent"] && (
               <div className={itemWrapper}>
-                <p className={itemName}>Quantity of {productName} in {selectedUnits["parent"]}</p>
+                <p className={itemName}> Total Quantity(number) of - {selectedUnits["parent"]}</p>
                 <input
                   type="number"
                   value={quantity}
@@ -442,9 +446,7 @@ const AddProduct = () => {
           </div>
 
 
-
-
-          {/* <div className={itemWrapper}>
+          <div className={itemWrapper}>
             <p className={itemName}>Weight:</p>
             <div className="flex gap-2 w-full">
               <input
@@ -466,7 +468,7 @@ const AddProduct = () => {
                 ))}
               </select>
             </div>
-          </div> */}
+          </div>
 
           <div className="flex gap-3 justify-start items-center">
             <label className={itemName}>Paid:</label>
