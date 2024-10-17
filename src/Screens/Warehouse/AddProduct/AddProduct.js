@@ -499,7 +499,17 @@ const AddProduct = () => {
                 <input
                   type="number"
                   value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value))}
+                  // onChange={(e) => setQuantity(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    const newQuantity = parseInt(e.target.value);
+                    setQuantity(newQuantity)
+
+                    // Update unitcollection 
+                    set_quantity_collection((prev) => ({
+                      ...prev,
+                      [unit_collection["parent"]]: newQuantity,
+                    }));
+                  }}
                   required
                   className={itemInputField}
                   placeholder="Enter Quantity(Number)"
