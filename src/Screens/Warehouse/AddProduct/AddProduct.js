@@ -5,12 +5,12 @@ import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSu
 const units = ["kg", "gram", "liter", "milliliter"];
 const paymentModes = ["online", "cash"];
 
-const parentUnits = ["container", "box", "sack", "can", "sache", "pieces", "kg", "gram", "liter", "milliliter"];
+const parentUnits = ["container", "box", "sack", "can", "sache", "piece", "kg", "gram", "liter", "milliliter"];
 
 const unitHierarchy = {
-  container: ["box", "sack", "can", "sache", "pieces", "kg", "gram", "liter", "milliliter"],
-  box: ["can", "sache", "pieces", "kg", "gram", "liter", "milliliter"],
-  sack: ["can", "sache", "pieces", "kg", "gram", "liter", "milliliter"],
+  container: ["box", "sack", "can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
+  box: ["can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
+  sack: ["can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
   can: [],
   pieces: [],
   sache: [],
@@ -21,13 +21,14 @@ const unitHierarchy = {
 };
 
 const AddProduct = () => {
-  const [primaryUnit, setPrimaryUnit] = useState("");
+  // const [primaryUnit, setPrimaryUnit] = useState("");
 
   // all selected units 
   const [selectedUnits, setSelectedUnits] = useState({});
 
 
   const [quantities, setQuantities] = useState({});
+  const [priceCollection, setPriceCollection] = useState({});
 
 
   const [productName, setProductName] = useState("");
@@ -53,6 +54,12 @@ const AddProduct = () => {
 
   console.log("quantities")
   console.log(quantities)
+
+  console.log("selectedUnits")
+  console.log(selectedUnits);
+
+  console.log("priceCollection")
+  console.log(priceCollection)
 
 
   useEffect(() => {
@@ -237,7 +244,7 @@ const AddProduct = () => {
     if (availableUnits.length === 0) return null;
 
     return (
-      <div className={itemWrapper}>
+      <div className={itemWrapper} >
         <label className={itemName}>{`Select sub-unit for ${parent}`}</label>
         <select
           className={itemInputField}
@@ -270,30 +277,40 @@ const AddProduct = () => {
       if (key === "parent") return null;
 
       // Get the parent unit's name
-      const parentUnit = entries[index - 1] ? entries[index - 1][1] : selectedUnits["parent"];
+      // get ancestor unit
+      const ancestorUnit = entries[index - 1] ? entries[index - 1][1] : selectedUnits["parent"];
 
       const handleQuantityChange = (e) => {
         const quantityValue = e.target.value;
+
         setQuantities((prevQuantities) => ({
           ...prevQuantities,
           [value]: quantityValue,
         }));
+
+        // handle this carefully, may be key is not present
+        setPriceCollection((prev) => ({
+          ...prev,
+          [value]: priceCollection[ancestorUnit] / quantityValue,
+        }));
       };
 
       return (
-        <div key={key} className="mt-4">
-          <p>
-            A {parentUnit} has
-            <input
-              type="number"
-              value={quantities[value] || ""}
-              onChange={handleQuantityChange}
-              className="border border-gray-950 h-10 px-2 py-1 mx-2 rounded-md"
-              placeholder={`Enter number of ${value}`}
-              required
-            />
-            {value}(s)
-          </p>
+        <div key={key} className={itemWrapper}>
+
+          {/* how ancestorUnit = coming form iterations */}
+          {/* ancestor unit */}
+          <p className={itemName}>Number of  {value}(s) in  a {ancestorUnit} </p>
+
+          <input
+            type="number"
+            value={quantities[value] || ""}
+            onChange={handleQuantityChange}
+            className={itemInputField}
+            placeholder={`Enter number of ${value} in a ${ancestorUnit}`}
+            required
+          />
+
         </div>
       );
     });
@@ -362,7 +379,7 @@ const AddProduct = () => {
           </div> */}
 
           <div>
-            <h2 className="text-lg font-bold">Unit Selection</h2>
+            <h2 className="text-xl font-bold mb-2">Unit Selection</h2>
             <div className={itemWrapper}>
               <label className={itemName}>Select a Parent Unit</label>
               <select
@@ -388,14 +405,20 @@ const AddProduct = () => {
 
 
 
-          <div>
-            {Object.entries(selectedUnits).map(([parent, unit]) => (
-              <div key={parent}>
-                {/* If 'unit' is an object, use JSON.stringify() */}
-                <p>{parent} -  {typeof unit === 'object' ? JSON.stringify(unit) : unit}</p>
-              </div>
-            ))}
+          <div className={itemWrapper}>
+            <p className={itemName}>Unit Summary :</p>
+            <div className="flex flex-row gap-1">
+              {Object.entries(selectedUnits).map(([parent, unit], index, arr) => (
+                <div key={parent}>
+                  {/* If 'unit' is an object, use JSON.stringify() */}
+                  <span>{typeof unit === 'object' ? JSON.stringify(unit) : unit}</span>
+                  {/* Conditionally render the '->' symbol if it's not the last item */}
+                  {index < arr.length - 1 && <span> {"->"} </span>}
+                </div>
+              ))}
+            </div>
           </div>
+
 
           {
             selectedUnits["parent"] && (
@@ -404,7 +427,17 @@ const AddProduct = () => {
                 <input
                   type="number"
                   value={price}
-                  onChange={(e) => setPrice(parseFloat(e.target.value))}
+                  // onChange={(e) => setPrice(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    const newPrice = parseFloat(e.target.value);
+                    setPrice(newPrice);
+                    
+                    // Update priceCollection with the selected unit and its price
+                    setPriceCollection((prev) => ({
+                      ...prev,
+                      [selectedUnits["parent"]]: newPrice,
+                    }));
+                  }}
                   required
                   className={itemInputField}
                   placeholder="Enter Price"
@@ -416,14 +449,14 @@ const AddProduct = () => {
           {
             selectedUnits["parent"] && (
               <div className={itemWrapper}>
-                <p className={itemName}> Total Quantity(number) of - {selectedUnits["parent"]}</p>
+                <p className={itemName}> Number of - {selectedUnits["parent"]}</p>
                 <input
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value))}
                   required
                   className={itemInputField}
-                  placeholder="Enter Quantity"
+                  placeholder="Enter Quantity(Number)"
                 />
               </div>
             )
@@ -435,18 +468,21 @@ const AddProduct = () => {
           }
 
 
-          <div>
-            <p>total container(s) = {quantity}</p>
-            {Object.entries(quantities).map(([unitType, unitQuantity]) => (
-              <div key={unitType}>
-                {/* If 'unit' is an object, use JSON.stringify() */}
-                <p> total {unitType}(s) =  {typeof unitQuantity === 'object' ? JSON.stringify(unitQuantity) : unitQuantity}</p>
-              </div>
-            ))}
+          <div className={itemWrapper}>
+            <p className={itemName}>Quantity Summary : </p>
+            <div>
+              <p>total container(s) = {quantity}</p>
+              {Object.entries(quantities).map(([unitType, unitQuantity]) => (
+                <div key={unitType}>
+                  {/* If 'unit' is an object, use JSON.stringify() */}
+                  <p> total {unitType}(s) =  {typeof unitQuantity === 'object' ? JSON.stringify(unitQuantity) : unitQuantity}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
 
-          <div className={itemWrapper}>
+          {/* <div className={itemWrapper}>
             <p className={itemName}>Weight:</p>
             <div className="flex gap-2 w-full">
               <input
@@ -468,7 +504,7 @@ const AddProduct = () => {
                 ))}
               </select>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex gap-3 justify-start items-center">
             <label className={itemName}>Paid:</label>
