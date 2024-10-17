@@ -334,7 +334,6 @@ const AddProduct = () => {
         if (!ancestorUnit || !priceCollection[ancestorUnit]) {
           return;
         }
-
         setPriceCollection((prev) => ({
           ...prev,
           [value]: priceCollection[ancestorUnit] / quantityValue,
