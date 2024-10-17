@@ -55,7 +55,7 @@ const StoreFront = () => {
       </div>
 
       {/* Content area below navbar */}
-      <div className="pt-20 p-6 w-full max-w-4xl mx-auto">
+      <div className="pt-20 p-6 w-full max-w-5xl mx-auto">
         <div className="bg-white shadow-md rounded-md p-6">
           {renderComponent()}
         </div>
