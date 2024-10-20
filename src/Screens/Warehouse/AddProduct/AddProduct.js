@@ -1,22 +1,73 @@
+// first undertand properly - to make changes here 
+// critical things, - if working - do not touch
+
+
 import React, { useState, useEffect } from "react";
 import { db, collection, addDoc, query, where, getDocs, updateDoc, doc, serverTimestamp } from "../../../firebase";
 import CustomButtonSubmit from "../../../components/cssComponents/CustomButtonSubmit.jsx"
 
-const units = ["kg", "gram", "liter", "milliliter"];
+// const units = ["kg", "gram", "liter", "milliliter"];
+
 const paymentModes = ["online", "cash"];
 
+const parentUnits = ["container", "box", "sack", "can", "sache", "piece", "kg", "gram", "liter", "milliliter"];
+
+const unitHierarchy = {
+  container: ["box", "sack", "can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
+  box: ["can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
+  sack: ["can", "sache", "piece", "kg", "gram", "liter", "milliliter"],
+  can: [],
+  pieces: [],
+  sache: [],
+  kg: [],
+  gram: [],
+  liter: [],
+  milliliter: []
+};
+
 const AddProduct = () => {
+  // const [primaryUnit, setPrimaryUnit] = useState("");
+
+  // all selected units 
   const [productName, setProductName] = useState("");
+
   const [quantity, setQuantity] = useState("");
+  const [quantity_collection, set_quantity_collection] = useState({});
+
   const [price, setPrice] = useState("");
+  const [priceCollection, setPriceCollection] = useState({});
+
   const [weight, setWeight] = useState("");
-  const [unit, setUnit] = useState(units[0]);
+
+  const [unit, setUnit] = useState("not_unit_added");
+  const [unit_collection, set_unit_collection] = useState({});
+
   const [paid, setPaid] = useState(false);
   const [paymentMode, setPaymentMode] = useState(paymentModes[0]);
   const [creditorName, setCreditorName] = useState("");
   const [existingProducts, setExistingProducts] = useState([]);
   const [creditors, setCreditors] = useState([]);
   const [selectedCreditorId, setSelectedCreditorId] = useState("");
+
+  const handleSelect = (unit, parent) => {
+
+    set_unit_collection((prev_unit_collection) => ({
+      ...prev_unit_collection,
+      [parent]: unit,
+    }));
+
+    setUnit(unit_collection["parent"])
+  };
+
+  console.log("quantity_collection")
+  console.log(quantity_collection)
+
+  console.log("unit_collection")
+  console.log(unit_collection);
+
+  console.log("priceCollection")
+  console.log(priceCollection)
+
 
   useEffect(() => {
     // where we are using this
@@ -47,6 +98,12 @@ const AddProduct = () => {
   }, [productName]);
 
   const handleSubmit = async (e) => {
+
+    if (!productName.trim()) {
+      alert("product name is emtpy")
+      return;
+    }
+
     e.preventDefault();
     try {
       let productUpdated = false;
@@ -60,7 +117,7 @@ const AddProduct = () => {
           const newCreditorRef = await addDoc(collection(db, "creditors"), {
             name: creditorName,
             createdAt: serverTimestamp(),
-            updatedAt : serverTimestamp(),
+            updatedAt: serverTimestamp(),
             creditorId: ""
           });
           // Update the creditorId and state
@@ -77,19 +134,23 @@ const AddProduct = () => {
 
       console.log("Existing products:", existingProducts);
 
+
+
       // Update existing product logic
       for (let product of existingProducts) {
         alert(`Checking product: ${product.name} @ ${product.price}`);
 
         // same product - deciding on basis on pirce, weight & unit (like  kg/litre/meter)
         if (product.price === price && product.weight === weight && product.unit === unit) {
-         
+
           alert(`Updating product ID: ${product.id}`);
+
           const updatedProductData = {
-            updatedAt : serverTimestamp(),
-            quantity : product.quantity + quantity,
-            price : price,
+            updatedAt: serverTimestamp(),
+            quantity: product.quantity + quantity,
+            price: price,
           }
+
           // updating product 
           const productRef = doc(db, "products", product.id);
           await updateDoc(productRef, updatedProductData);
@@ -108,9 +169,13 @@ const AddProduct = () => {
             paymentMode: paid ? paymentMode : null,
             // paid = false, then add creditor
             creditorId: paid ? null : creditorIdToUse,
-            productId : product.id,
+            productId: product.id,
             createdAt: serverTimestamp(),
-            updatedAt : serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            unit_collection,
+            priceCollection,
+            quantity_collection,
+
           };
 
           // we will never update this sub collection parts , never , this is our history record, 
@@ -137,6 +202,9 @@ const AddProduct = () => {
           unit: unit,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
+          unit_collection,
+          priceCollection,
+          quantity_collection,
         };
         // Add the new product to the collection
         // this will be updating, if product matches , code in above 
@@ -158,9 +226,12 @@ const AddProduct = () => {
           paymentMode: paid ? paymentMode : null,
           // paid = false, then add creditor
           creditorId: paid ? null : creditorIdToUse,
-          productId : productRef.id,
+          productId: productRef.id,
           createdAt: serverTimestamp(),
-          updatedAt : serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          unit_collection,
+          priceCollection,
+          quantity_collection,
         };
         // Adding new subcollection 'warehouse' inside the newly created product
         // we will never update this sub collection parts , never , this is our history record, 
@@ -174,12 +245,16 @@ const AddProduct = () => {
       setQuantity("");
       setPrice("");
       setWeight("");
-      setUnit(units[0]);
+      // setUnit(units[0]);
       setPaid(false);
       setPaymentMode(paymentModes[0]);
       setCreditorName("");
       setExistingProducts([]);
       setSelectedCreditorId("");
+      set_unit_collection({});
+      set_quantity_collection({});
+      setPriceCollection({})
+
       alert("Product saved successfully!");
 
     } catch (error) {
@@ -195,6 +270,104 @@ const AddProduct = () => {
   const itemInputField = 'border border-gray-950 h-12 px-2 py-2 w-full rounded-md'
 
 
+  const renderDropdown = (parent) => {
+    const availableUnits = unitHierarchy[parent] || [];
+    if (availableUnits.length === 0) return null;
+
+
+    return (
+      <div className={itemWrapper} >
+        <label className={itemName}>{`Select sub-unit for ${parent}`}</label>
+        <select
+          className={itemInputField}
+          value={unit_collection[parent] || ""}
+          onChange={(e) => handleSelect(e.target.value, parent)}
+        >
+
+          <option value="" disabled>
+            Select a unit
+          </option>
+          {availableUnits.map((unit) => (
+            <option key={unit} value={unit}>
+              {unit}
+            </option>
+          ))}
+        </select>
+
+        {/* recursion here, - calling renderDropdown again  */}
+        {unit_collection[parent] && renderDropdown(unit_collection[parent])}
+      </div>
+    );
+  };
+
+
+  const renderQuantityInputs = () => {
+    const entries = Object.entries(unit_collection);
+
+    return entries.map(([key, value], index) => {
+      // Skip rendering the parent unit itself as an input
+      if (key === "parent") return null;
+
+      // Get the parent unit's name
+      // get ancestor unit
+      const ancestorUnit = entries[index - 1] ? entries[index - 1][1] : unit_collection["parent"];
+
+      const handleQuantityChange = (e) => {
+        const quantityValue = e.target.value;
+
+        if (isNaN(quantityValue) || quantityValue <= 0) {
+          alert("quantity should be greater than zero")
+          return;
+          // Skip if invalid
+        }
+
+
+        set_quantity_collection((prevquantity_collection) => ({
+          ...prevquantity_collection,
+          [value]: quantityValue,
+        }));
+
+
+
+        // handle this carefully, may be key is not present
+
+        if (!ancestorUnit || !priceCollection[ancestorUnit]) {
+          return;
+        }
+        setPriceCollection((prev) => ({
+          ...prev,
+          [value]: priceCollection[ancestorUnit] / quantityValue,
+        }));
+      };
+
+      return (
+        <div key={key} className={itemWrapper}>
+
+          {/* how ancestorUnit = coming form iterations */}
+          {/* ancestor unit */}
+          <p className={itemName}>Number of  {value}(s) in  a {ancestorUnit} </p>
+
+          <input
+            type="number"
+            value={quantity_collection[value] || ""}
+            onChange={handleQuantityChange}
+            className={itemInputField}
+            placeholder={`Enter number of ${value} in a ${ancestorUnit}`}
+            required
+          />
+
+        </div>
+      );
+    });
+  };
+
+
+
+
+
+
+
+
   return (
     <div className=" w-full flex justify-center items-center">
       <div className="p-6 w-full text-gray-900 flex flex-col gap-6 items-center justify-start ">
@@ -203,6 +376,8 @@ const AddProduct = () => {
           onSubmit={handleSubmit}
           className="w-full px-4 py-6 bg-white flex flex-col gap-8"
         >
+
+
           <div className={itemWrapper}>
             <p className={itemName}>Product Name:</p>
             <input
@@ -230,31 +405,140 @@ const AddProduct = () => {
               </div>
             )}
           </div>
-          <div className={itemWrapper}>
-            <p className={itemName}>Quantity:</p>
-            <input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value))}
-              required
-              className={itemInputField}
-              placeholder="Enter Quantity"
-            />
-          </div>
-          <div className={itemWrapper}>
-            <p className={itemName}>Price:</p>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(parseFloat(e.target.value))}
-              required
-              className={itemInputField}
-              placeholder="Enter Price"
-            />
-          </div>
-          <div className={itemWrapper}>
-            <p className={itemName}>Weight:</p>
 
+
+
+          {/* <div>
+            <p>Select Primary Unit</p>
+            <select
+              value={primaryUnit}
+              onChange={(e) => setPrimaryUnit(e.target.value)}
+              className="border border-gray-950 h-12 px-2 py-2 rounded-md"
+              required
+            >
+              <option value="" disabled>Select Unit</option>
+              {parentUnits.map((unitOption) => (
+                <option key={unitOption} value={unitOption}>{unitOption}</option>
+              ))}
+            </select>
+          </div> */}
+
+          <div>
+            <h2 className="text-xl font-bold mb-2">Unit Selection</h2>
+            <div className={itemWrapper}>
+              <label className={itemName}>Select a Parent Unit</label>
+              <select
+                className={itemInputField}
+                value={unit_collection["parent"] || ""}
+                onChange={(e) => handleSelect(e.target.value, "parent")}
+              >
+                <option value="" disabled>
+                  Select a unit
+                </option>
+                {parentUnits.map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
+              </select>
+
+              {/* calling renderDropDown for first time - this is recursive functions */}
+              {unit_collection["parent"] && renderDropdown(unit_collection["parent"])}
+            </div>
+          </div>
+
+
+
+
+          <div className={itemWrapper}>
+            <p className={itemName}>Unit Summary :</p>
+            <div className="flex flex-row gap-1">
+              {Object.entries(unit_collection).map(([parent, unit], index, arr) => (
+                <div key={parent}>
+                  {/* If 'unit' is an object, use JSON.stringify() */}
+                  <span>{typeof unit === 'object' ? JSON.stringify(unit) : unit}</span>
+                  {/* Conditionally render the '->' symbol if it's not the last item */}
+                  {index < arr.length - 1 && <span> {"->"} </span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+
+          {
+            unit_collection["parent"] && (
+              <div className={itemWrapper}>
+                <p className={itemName}>Price of - 1 {unit_collection["parent"]} :</p>
+                <input
+                  type="number"
+                  value={price}
+                  // onChange={(e) => setPrice(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    const newPrice = parseFloat(e.target.value);
+                    setPrice(newPrice);
+
+                    // Update priceCollection with the selected unit and its price
+                    setPriceCollection((prev) => ({
+                      ...prev,
+                      [unit_collection["parent"]]: newPrice,
+                    }));
+                  }}
+                  required
+                  className={itemInputField}
+                  placeholder="Enter Price"
+                />
+              </div>
+            )
+          }
+
+          {
+            unit_collection["parent"] && (
+              <div className={itemWrapper}>
+                <p className={itemName}> Number of - {unit_collection["parent"]}</p>
+                <input
+                  type="number"
+                  value={quantity}
+                  // onChange={(e) => setQuantity(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    const newQuantity = parseInt(e.target.value);
+                    setQuantity(newQuantity)
+
+                    // Update unitcollection 
+                    set_quantity_collection((prev) => ({
+                      ...prev,
+                      [unit_collection["parent"]]: newQuantity,
+                    }));
+                  }}
+                  required
+                  className={itemInputField}
+                  placeholder="Enter Quantity(Number)"
+                />
+              </div>
+            )
+          }
+
+
+          {
+            unit_collection["parent"] && renderQuantityInputs()
+          }
+
+
+          <div className={itemWrapper}>
+            <p className={itemName}>Quantity Summary : </p>
+            <div>
+              <p>total container(s) = {quantity}</p>
+              {Object.entries(quantity_collection).map(([unitType, unitQuantity]) => (
+                <div key={unitType}>
+                  {/* If 'unit' is an object, use JSON.stringify() */}
+                  <p> total {unitType}(s) =  {typeof unitQuantity === 'object' ? JSON.stringify(unitQuantity) : unitQuantity}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+
+          {/* <div className={itemWrapper}>
+            <p className={itemName}>Weight:</p>
             <div className="flex gap-2 w-full">
               <input
                 type="number"
@@ -275,7 +559,7 @@ const AddProduct = () => {
                 ))}
               </select>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex gap-3 justify-start items-center">
             <label className={itemName}>Paid:</label>

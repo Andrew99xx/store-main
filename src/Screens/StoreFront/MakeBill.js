@@ -355,7 +355,8 @@ const MakeBill = () => {
             <tr className="bg-gray-200 text-gray-700">
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Weight</th>
+              {/* <th className="px-4 py-2 text-left">Weight</th> */}
+               <th className="px-4 py-2 text-left">Unit</th>
               <th className="px-4 py-2 text-left">Price</th>
               <th className="px-4 py-2 text-left">Quantity Available</th>
               <th className="px-4 py-2 text-left">Select Quantity</th>
@@ -366,7 +367,8 @@ const MakeBill = () => {
               <tr key={product.id} className="border-t">
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>
-                <td className="px-4 py-2">{product.weight + product.unit}</td>
+                {/* <td className="px-4 py-2">{product.weight + product.unit}</td> */}
+                <td className="px-4 py-2">{product.unit}</td>
                 <td className="px-4 py-2">₹{product.price}</td>
                 <td className="px-4 py-2">{product.quantity}</td>
                 <td className="px-4 py-2 flex items-center">
@@ -409,7 +411,7 @@ const MakeBill = () => {
             <tr className="bg-gray-200 text-gray-700">
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Weight</th>
+              <th className="px-4 py-2 text-left">Unit</th>
               <th className="px-4 py-2 text-left">Price</th>
               <th className="px-4 py-2 text-left">Selected Quantity</th>
               <th className="px-4 py-2 text-left">Total Price</th>
@@ -421,7 +423,7 @@ const MakeBill = () => {
               <tr key={product.id} className="border-t">
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>
-                <td className="px-4 py-2">{product.weight + product.unit}</td>
+                <td className="px-4 py-2">{product.unit}</td>
                 <td className="px-4 py-2">₹{product.price}</td>
                 <td className="px-4 py-2">{product.selectedQuantity}</td>
                 <td className="px-4 py-2">₹{product.selectedQuantity * product.price}</td>
