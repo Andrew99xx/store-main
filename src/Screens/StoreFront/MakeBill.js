@@ -106,7 +106,7 @@ const MakeBill = () => {
               0,
               Math.min(product.quantity, newQuantity)
             ),
-            unit: product.unit,
+            display_unit: product.display_unit,
             // Ensure quantity does not go below 0 or above available stock
           };
         }
@@ -132,7 +132,7 @@ const MakeBill = () => {
   //   const existingProductIndex = selectedProducts.findIndex(
   //     (item) => item.id === updatedProduct.id
   //   );
-  
+
   //   if (existingProductIndex !== -1) {
   //     // Update the existing product in selectedProducts array
   //     const updatedProducts = [...selectedProducts];
@@ -159,7 +159,7 @@ const MakeBill = () => {
   //     ]);
   //   }
   // };
-  
+
 
   const handleInputChange = (product, event) => {
     const value = event.target.value;
@@ -415,12 +415,13 @@ const MakeBill = () => {
                 <td className="px-4 py-2 w-full">
                   <ProductUnitSelector
                     product={product}
-                    handleAddProduct={handleAddProduct}
+                     handleAddProduct={handleAddProduct}
+                    setFilteredProducts={setFilteredProducts}
                   />
-                  
+
                 </td>
-                <td className="px-4 py-2">₹{product.price}</td>
-                <td className="px-4 py-2">{product.quantity}</td>
+                <td className="px-4 py-2">₹{product.priceCollection[product.display_unit]}</td>
+                <td className="px-4 py-2">{product.quantity_collection[product.display_unit]}</td>
                 <td className="px-4 py-2 flex items-center">
                   <button
                     className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
@@ -450,7 +451,7 @@ const MakeBill = () => {
                 <td>
                   <button
                     className="text-nowrap px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    // onClick={() => handleAddProduct(product, product.selectedQuantity)}
+                  // onClick={() => handleAddProduct(product, product.selectedQuantity)}
                   >
                     Add to Cart
                   </button>
@@ -482,8 +483,9 @@ const MakeBill = () => {
               <tr key={product.id} className="border-t">
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>
-                <td className="px-4 py-2">{product.unit}</td>
-                <td className="px-4 py-2">₹{product.price}</td>
+                <td className="px-4 py-2">{product.display_unit || product.unit}</td>
+                <td className="px-4 py-2">₹{product.priceCollection[product.display_unit || product.unit]}</td>
+
                 <td className="px-4 py-2">{product.selectedQuantity}</td>
                 <td className="px-4 py-2">₹{product.selectedQuantity * product.price}</td>
                 <td className="px-4 py-2">
