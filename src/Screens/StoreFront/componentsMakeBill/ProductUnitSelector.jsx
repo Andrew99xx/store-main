@@ -50,7 +50,7 @@ export const ProductUnitSelector = ({ product, handleAddProduct, setFilteredProd
                     <option 
                     key={key} 
                     value={value}
-                    className='w-20'
+                    className='text-nowrap'
                     >
                         {value} {/* Display the unit name */}
                     </option>
