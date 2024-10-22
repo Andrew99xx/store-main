@@ -12,10 +12,12 @@ import {
 } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import Autosuggest from "react-autosuggest"; // Import react-autosuggest
+import { ProductUnitSelector } from "./componentsMakeBill/ProductUnitSelector";
 
 const MakeBill = () => {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
+  // const [defaultProductUnit, setDefaultProductUnit] = useState(products.unit || "");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerId, setCustomerId] = useState("");
@@ -85,6 +87,11 @@ const MakeBill = () => {
     }
   }, [amountPaid, finalAmount])
 
+  // const handleUnitChange = (event) => {
+  //   setDefaultProductUnit(event.target.value);
+  //   // Handle additional logic if necessary (e.g., updating state or calculations)
+  // };
+
   const handleAddProduct = (product, quantity) => {
     const existingProduct = selectedProducts.find(
       (item) => item.id === product.id
@@ -99,6 +106,7 @@ const MakeBill = () => {
               0,
               Math.min(product.quantity, newQuantity)
             ),
+            unit: product.unit,
             // Ensure quantity does not go below 0 or above available stock
           };
         }
@@ -119,6 +127,39 @@ const MakeBill = () => {
       ]);
     }
   };
+
+  // const handleAddProduct = (updatedProduct, quantity) => {
+  //   const existingProductIndex = selectedProducts.findIndex(
+  //     (item) => item.id === updatedProduct.id
+  //   );
+  
+  //   if (existingProductIndex !== -1) {
+  //     // Update the existing product in selectedProducts array
+  //     const updatedProducts = [...selectedProducts];
+  //     updatedProducts[existingProductIndex] = {
+  //       ...updatedProducts[existingProductIndex],
+  //       selectedQuantity: Math.max(
+  //         0,
+  //         Math.min(updatedProduct.quantity, quantity)
+  //       ),
+  //       unit: updatedProduct.unit, // Ensure the unit is updated
+  //     };
+  //     setSelectedProducts(updatedProducts);
+  //   } else {
+  //     // Add the product if it doesn't exist yet
+  //     setSelectedProducts([
+  //       ...selectedProducts,
+  //       {
+  //         ...updatedProduct,
+  //         selectedQuantity: Math.max(
+  //           0,
+  //           Math.min(updatedProduct.quantity, quantity)
+  //         ), 
+  //       },
+  //     ]);
+  //   }
+  // };
+  
 
   const handleInputChange = (product, event) => {
     const value = event.target.value;
@@ -313,8 +354,9 @@ const MakeBill = () => {
     className: "px-2 py-2 flex-1 w-full"
   };
 
+
   return (
-    <div className=" mx-auto p-4">
+    <div className="mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Bill</h2>
 
 
@@ -356,10 +398,11 @@ const MakeBill = () => {
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
               {/* <th className="px-4 py-2 text-left">Weight</th> */}
-               <th className="px-4 py-2 text-left">Unit</th>
+              <th className="px-4 py-2 text-left">Unit</th>
               <th className="px-4 py-2 text-left">Price</th>
               <th className="px-4 py-2 text-left">Quantity Available</th>
               <th className="px-4 py-2 text-left">Select Quantity</th>
+              <th className="px-4 py-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -368,7 +411,14 @@ const MakeBill = () => {
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>
                 {/* <td className="px-4 py-2">{product.weight + product.unit}</td> */}
-                <td className="px-4 py-2">{product.unit}</td>
+                {/* <td className="px-4 py-2">{product.unit}</td> */}
+                <td className="px-4 py-2 w-full">
+                  <ProductUnitSelector
+                    product={product}
+                    handleAddProduct={handleAddProduct}
+                  />
+                  
+                </td>
                 <td className="px-4 py-2">₹{product.price}</td>
                 <td className="px-4 py-2">{product.quantity}</td>
                 <td className="px-4 py-2 flex items-center">
@@ -397,6 +447,15 @@ const MakeBill = () => {
                     +
                   </button>
                 </td>
+                <td>
+                  <button
+                    className="text-nowrap px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    // onClick={() => handleAddProduct(product, product.selectedQuantity)}
+                  >
+                    Add to Cart
+                  </button>
+                </td>
+
               </tr>
             ))}
           </tbody>
